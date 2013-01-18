@@ -1,0 +1,38 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/selectMap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_map" />
+
+        <TextView
+          
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/number_waypoints" />
+        <Spinner
+            android:id="@+id/spinnerWaypoint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:prompt="@string/waypoint_prompt"
+            android:entries="@array/number_waypoints" />
+            </LinearLayout>
+
+    
+    <com.CPS.test2.DrawView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/draw_view" />
+
+</LinearLayout>
