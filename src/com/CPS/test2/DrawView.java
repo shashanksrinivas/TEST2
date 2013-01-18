@@ -2,6 +2,7 @@ package com.CPS.test2;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -10,7 +11,7 @@ import android.view.View;
 public class DrawView extends View {
    private ColorBall[] colorballs = new ColorBall[10]; // array that holds the balls
    private int balID = 0; // variable to know what ball is being dragged
-  
+   Paint paint = new Paint();
     
    
     public DrawView(Context context, AttributeSet attributeset) {
@@ -72,6 +73,8 @@ public class DrawView extends View {
     	
     	for (int i = 0;i< MainActivity.numWaypoints;i++){
     		canvas.drawBitmap(colorballs[i].getBitmap(), colorballs[i].getX(), colorballs[i].getY(), null);
+    		
+    		canvas.drawText(String.valueOf(colorballs[i].getID()), colorballs[i].getX(), colorballs[i].getY(), paint);
     	}
 
     }

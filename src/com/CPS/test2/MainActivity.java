@@ -13,7 +13,7 @@ import android.widget.Spinner;
 public class MainActivity extends Activity {
 
 	public Spinner spinnerWaypoint;
-	public static int numWaypoints=4;
+	public static int numWaypoints=10;
 	
 	
     @Override
