@@ -64,6 +64,14 @@ public class ColorBall  {
 		return img;
 	}
 	
+	public int getWidth(){
+		return img.getWidth();
+	}
+	
+	public int getHeight(){
+		return img.getHeight();
+	}
+	
 	public void moveBall(int goX, int goY) {
 		// check the borders, and set the direction if a border has reached
 		if (coordX > 270){
