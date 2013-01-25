@@ -18,10 +18,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnCheckedChangeListener{
 	
 	ImageView choosenImageView;
 	  Button choosePicture;
@@ -37,15 +40,48 @@ public class MainActivity extends Activity {
 	public Spinner spinnerWaypoint;
 	public static int numWaypoints=10;
 	
+	CheckBox wayPoint1;
+	CheckBox wayPoint2;
+	CheckBox wayPoint3;
+	CheckBox wayPoint4;
+	CheckBox wayPoint5;
+	CheckBox wayPoint6;
+	CheckBox wayPoint7;
+	CheckBox wayPoint8;
+	CheckBox wayPoint9;
+	CheckBox wayPoint10;
+	
+	static boolean waypoint[] = new boolean[10];//keeps the status of waypoints (enabled/disabled)
+	
+	
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);        
-        
+        wayPoint1 = (CheckBox) findViewById(R.id.wayPoint1);
+        wayPoint2 = (CheckBox) findViewById(R.id.wayPoint2);
+        wayPoint3 = (CheckBox) findViewById(R.id.wayPoint3);
+        wayPoint4 = (CheckBox) findViewById(R.id.wayPoint4);
+        wayPoint5 = (CheckBox) findViewById(R.id.wayPoint5);
+        wayPoint6 = (CheckBox) findViewById(R.id.wayPoint6);
+        wayPoint7 = (CheckBox) findViewById(R.id.wayPoint7);
+        wayPoint8 = (CheckBox) findViewById(R.id.wayPoint8);
+        wayPoint9 = (CheckBox) findViewById(R.id.wayPoint9);
+        wayPoint10 = (CheckBox) findViewById(R.id.wayPoint10);
+        wayPoint1.setOnCheckedChangeListener(this);
+        wayPoint2.setOnCheckedChangeListener(this);
+        wayPoint3.setOnCheckedChangeListener(this);
+        wayPoint4.setOnCheckedChangeListener(this);
+        wayPoint5.setOnCheckedChangeListener(this);
+        wayPoint6.setOnCheckedChangeListener(this);
+        wayPoint7.setOnCheckedChangeListener(this);
+        wayPoint8.setOnCheckedChangeListener(this);
+        wayPoint9.setOnCheckedChangeListener(this);
+        wayPoint10.setOnCheckedChangeListener(this);
         spinnerWaypoint = (Spinner) findViewById(R.id.spinnerWaypoint);
         spinnerWaypoint.setOnItemSelectedListener(new OnItemSelectedListener() {
-
+        	
  			@Override
  			public void onItemSelected(AdapterView<?> arg0, View arg1,
  					int arg2, long arg3) {
@@ -114,6 +150,42 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		switch(buttonView.getId()){
+		case R.id.wayPoint1:
+			waypoint[0] = isChecked;
+			break;
+		case R.id.wayPoint2:
+			waypoint[1] = isChecked;
+			break;
+		case R.id.wayPoint3:
+			waypoint[2] = isChecked;
+			break;
+		case R.id.wayPoint4:
+			waypoint[3] = isChecked;
+			break;
+		case R.id.wayPoint5:
+			waypoint[4] = isChecked;
+			break;
+		case R.id.wayPoint6:
+			waypoint[5] = isChecked;
+			break;
+		case R.id.wayPoint7:
+			waypoint[6] = isChecked;
+			break;
+		case R.id.wayPoint8:
+			waypoint[7] = isChecked;
+			break;
+		case R.id.wayPoint9:
+			waypoint[8] = isChecked;
+			break;
+		case R.id.wayPoint10:
+			waypoint[9] = isChecked;
+			break;
+		}
+		
+	}
 
 	
     

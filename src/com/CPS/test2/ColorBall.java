@@ -10,9 +10,12 @@ public class ColorBall  {
  private int coordX = 0; // the x coordinate at the canvas
  private int coordY = 0; // the y coordinate at the canvas
  private int id; // gives every ball his own id, for now not necessary
+ private boolean enabled = false;
  private static int count = 1;
  private boolean goRight = true;
  private boolean goDown = true;
+ private boolean lineTo[] = new boolean[10];
+ 
  
 	public ColorBall(Context context, int drawable) {
 
@@ -70,6 +73,30 @@ public class ColorBall  {
 	
 	public int getHeight(){
 		return img.getHeight();
+	}
+	
+	public boolean isEnabled(){
+		return enabled;
+	}
+	
+	public void enable(){
+		enabled=true;
+	}
+	
+	public void disable(){
+		enabled=false;
+	}
+	
+	public void setLineTo(int i){
+		lineTo[i-1]=true;
+	}
+	
+	public boolean isLineTo(int i){
+		return lineTo[i-1];
+	}
+	
+	public void unsetLineTo(int i){
+		lineTo[i-1] = false;
 	}
 	
 	public void moveBall(int goX, int goY) {
