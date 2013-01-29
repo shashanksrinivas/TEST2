@@ -33,63 +33,79 @@
         android:id="@+id/wayPoint1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="1" />
+        android:text="1"
+        android:paddingRight="20dp" />
 
     <CheckBox
         android:id="@+id/wayPoint2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="2" />
+        android:text="2"
+        android:paddingRight="20dp" />
     
      <CheckBox
         android:id="@+id/wayPoint3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="3" />
+        android:text="3"
+        android:paddingRight="20dp" />
 
     <CheckBox
         android:id="@+id/wayPoint4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="4" />
+        android:text="4"
+        android:paddingRight="20dp" />
     
      <CheckBox
         android:id="@+id/wayPoint5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="5" />
+        android:text="5"
+        android:paddingRight="20dp"  />
 
     <CheckBox
         android:id="@+id/wayPoint6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="6" />
+        android:text="6" 
+        android:paddingRight="20dp"/>
     
      <CheckBox
         android:id="@+id/wayPoint7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="7" />
+        android:text="7"
+        android:paddingRight="20dp" />
 
     <CheckBox
         android:id="@+id/wayPoint8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="8" />
+        android:text="8"
+        android:paddingRight="20dp" />
     
      <CheckBox
         android:id="@+id/wayPoint9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="9" />
+        android:text="9"
+        android:paddingRight="20dp" />
 
     <CheckBox
         android:id="@+id/wayPoint10"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="10" />
+        android:text="10"
+        android:paddingRight="20dp" />
     
     </LinearLayout>
+    
+    <TextView
+        android:id="@+id/ltlTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="hello" />
 
     <com.CPS.test2.DrawView
         android:id="@+id/draw_view"

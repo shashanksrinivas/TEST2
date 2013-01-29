@@ -17,6 +17,7 @@ public class DrawView extends View implements OnGestureListener {
 	private int balID = 0; // variable to know what ball is being dragged
 	Paint paint = new Paint();
 	GestureDetector gestureDetector;
+	String string = "";
 
 	public DrawView(Context context, AttributeSet attributeset) {
 		super(context, attributeset);
@@ -27,7 +28,10 @@ public class DrawView extends View implements OnGestureListener {
 		point.y = 20;
 		for (int i = 0; i < 10; i++) {
 			point.x = point.x + 50;
-			colorballs[i] = new ColorBall(context, R.drawable.bol_rood, point);
+
+			colorballs[i] = new ColorBall(context, R.drawable.bol_groen,
+					R.drawable.bol_rood, point);
+
 		}
 
 	}
@@ -45,17 +49,17 @@ public class DrawView extends View implements OnGestureListener {
 			canvas.drawBitmap(MainActivity.scaledBitmap, MainActivity.matrix,
 					null);
 		}
-		 for (int i = 0; i < 10; i++) {
-		if(MainActivity.waypoint[i]){
-		 canvas.drawBitmap(colorballs[i].getBitmap(), colorballs[i].getX(),
-		 colorballs[i].getY(), null);
-		
-		 canvas.drawText(String.valueOf(colorballs[i].getID()),
-		 colorballs[i].getX() + colorballs[i].getWidth() / 2,
-		 colorballs[i].getY() + colorballs[i].getHeight() / 2, paint);
-		}
-		 }
+		for (int i = 0; i < 10; i++) {
+			if (MainActivity.waypoint[i]) {
+				canvas.drawBitmap(colorballs[i].getBitmap(),
+						colorballs[i].getX(), colorballs[i].getY(), null);
 
+				canvas.drawText(String.valueOf(colorballs[i].getID()),
+						colorballs[i].getX() + colorballs[i].getWidth() / 2,
+						colorballs[i].getY() + colorballs[i].getHeight() / 2,
+						paint);
+			}
+		}
 
 	}
 
@@ -167,18 +171,39 @@ public class DrawView extends View implements OnGestureListener {
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
-		// TODO Auto-generated method stub
-		return false;
+		if (balID > 0) {
+			if (colorballs[balID - 1].isValid()) {
+				colorballs[balID - 1].setValid(false);
+			} else {
+				colorballs[balID - 1].setValid(true);
+			}
+		}
+		invalidate();
+		return true;
 	}
 
 	@Override
 	protected void onCreateContextMenu(ContextMenu menu) {
 		// TODO Auto-generated method stub
 		super.onCreateContextMenu(menu);
-		menu.setHeaderTitle("Context Menu");
+		menu.setHeaderTitle("LTL: " + computeLtl());
 		menu.add("Go to Location");
 		menu.add("Avoid this Location");
 		menu.add("Pick up Object");
+	}
+
+	public String computeLtl() {
+		string = "";
+		for (int i = 0; i < 10; i++) {
+			if (MainActivity.waypoint[i]) {
+				if (string == "") {
+					string = string + colorballs[i].getLtlString();
+				} else {
+					string = string + " && " + colorballs[i].getLtlString();
+				}
+			}
+		}
+		return string;
 	}
 
 }
