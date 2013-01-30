@@ -12,17 +12,19 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class DrawView extends View implements OnGestureListener {
-	private ColorBall[] colorballs = new ColorBall[10]; // array that holds the
+	static ColorBall[] colorballs = new ColorBall[10]; // array that holds the
 														// balls
-	private int balID = 0; // variable to know what ball is being dragged
+	static int balID = 0; // variable to know what ball is being dragged
 	Paint paint = new Paint();
 	GestureDetector gestureDetector;
 	String string = "";
+	
 
 	public DrawView(Context context, AttributeSet attributeset) {
 		super(context, attributeset);
 		setFocusable(true); // necessary for getting the touch events
 		gestureDetector = new GestureDetector(this);
+		
 		Point point = new Point();
 		point.x = 0;
 		point.y = 20;
@@ -188,10 +190,11 @@ public class DrawView extends View implements OnGestureListener {
 		super.onCreateContextMenu(menu);
 		menu.setHeaderTitle("LTL: " + computeLtl());
 		menu.add("Go to Location");
-		menu.add("Avoid this Location");
+		menu.add("Activate Sensor");
 		menu.add("Pick up Object");
 	}
-
+	
+	
 	public String computeLtl() {
 		string = "";
 		for (int i = 0; i < 10; i++) {

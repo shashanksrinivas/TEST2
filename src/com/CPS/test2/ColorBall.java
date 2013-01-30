@@ -17,6 +17,8 @@ public class ColorBall  {
  private boolean goDown = true;
  private boolean lineTo[] = new boolean[10];
  private boolean valid = true;
+ private boolean pickObject = false;
+ private boolean activateSensor = false;
  private String ltlString = "";
  
  
@@ -41,7 +43,8 @@ public class ColorBall  {
         imgInvalid = BitmapFactory.decodeResource(context.getResources(), drawable2);
         id=count;
         //ltlString.concat(String.valueOf(id));
-        ltlString = "F(" + String.valueOf(id) + ")";
+        ltlString = String.valueOf(id);
+        setValid(isValid());
 		count++;
 		coordX= point.x;
 		coordY = point.y;
@@ -118,16 +121,36 @@ public class ColorBall  {
 	
 	public void setValid(boolean value){
 		valid=value;
-		if(!valid){
-			ltlString = "G not(" + id + ")";
-		}else{
-			ltlString = "F(" + id + ")";
-			
-		}
+		
+		
 	}
 	
 	public String getLtlString(){
+		if(pickObject && activateSensor){
+			ltlString = id + " U (Obj && Sen) ";
+		}else if(pickObject){
+			ltlString = id + " U Obj ";
+		}else if(activateSensor){
+			ltlString = id + " U Sen ";
+		}else{
+			ltlString = id + "";
+		}
+		if(!valid){
+			ltlString = "G NOT(" + ltlString + ")";
+		}else{
+			ltlString = "F(" + ltlString + ")";
+		}
 		return ltlString;
+	}
+	
+	public void togglePickObject(){
+		pickObject = !pickObject;
+		
+		//setValid(isValid());
+	}
+	
+	public void toggleActivateSensor(){
+		activateSensor = !activateSensor;
 	}
 	
 	public void moveBall(int goX, int goY) {

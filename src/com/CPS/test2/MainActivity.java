@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -95,6 +96,8 @@ public class MainActivity extends Activity implements OnCheckedChangeListener{
  				
  			}
  		});
+		DrawView dv = (DrawView) findViewById(R.id.draw_view);
+		registerForContextMenu(dv);
 		
         Button buttonLoadImage = (Button) findViewById(R.id.selectMap);
         buttonLoadImage.setOnClickListener(new View.OnClickListener() {
@@ -108,9 +111,21 @@ public class MainActivity extends Activity implements OnCheckedChangeListener{
 				
 			}
         });
-        
+       
     }
     @Override
+	public boolean onContextItemSelected(MenuItem item) {
+    	 if(item.getTitle()=="Pick up Object"){
+    		 
+    		 DrawView.colorballs[DrawView.balID - 1].togglePickObject();}  
+	     else if(item.getTitle()=="Activate Sensor"){
+	    	 DrawView.colorballs[DrawView.balID - 1].toggleActivateSensor();
+	     }  
+	     else {return false;}  
+	 return true;  
+		//return super.onContextItemSelected(item);
+	}
+	@Override
     protected void onActivityResult(int requestCode, int resultCode,
     	      Intent intent) {
     	    super.onActivityResult(requestCode, resultCode, intent);
