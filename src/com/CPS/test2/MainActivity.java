@@ -117,10 +117,22 @@ public class MainActivity extends Activity implements OnCheckedChangeListener{
 	public boolean onContextItemSelected(MenuItem item) {
     	 if(item.getTitle()=="Pick up Object"){
     		 
-    		 DrawView.colorballs[DrawView.balID - 1].togglePickObject();}  
+    		 DrawView.colorballs[DrawView.balID - 1].togglePickObject();
+    		 }
+    	 else if(item.getTitle()=="Drop Object"){
+	    	 DrawView.colorballs[DrawView.balID - 1].toggleDropObject();
+	     }  
 	     else if(item.getTitle()=="Activate Sensor"){
 	    	 DrawView.colorballs[DrawView.balID - 1].toggleActivateSensor();
 	     }  
+	     else if(item.getTitle()=="Deactivate Sensor"){
+	    	 DrawView.colorballs[DrawView.balID - 1].toggleDeactivateSensor();
+	     } 
+	     else if(item.getTitle()=="Go to Location"){
+	    	 DrawView.colorballs[DrawView.balID - 1].setClickState(1);
+	    	 DrawView.fromBalID = DrawView.balID;
+	     }
+    	 
 	     else {return false;}  
 	 return true;  
 		//return super.onContextItemSelected(item);
