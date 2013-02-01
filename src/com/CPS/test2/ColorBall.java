@@ -182,17 +182,38 @@ public class ColorBall {
 
 		// setValid(isValid());
 	}
+	public boolean isPickObject(){
+		return pickObject;
+	}
 
 	public void toggleDropObject() {
 		dropObject = !dropObject;
+	}
+	public boolean isDropObject(){
+		return dropObject;
 	}
 
 	public void toggleActivateSensor() {
 		activateSensor = !activateSensor;
 	}
+	public boolean isActivateSensor(){
+		return activateSensor;
+	}
 
 	public void toggleDeactivateSensor() {
 		deactivateSensor = !deactivateSensor;
+	}
+	public boolean isDeactivateSensor(){
+		return deactivateSensor;
+	}
+	
+	public boolean isLeaf(){
+		for(int i=0;i<10;i++){
+			if(isLineTo(i))
+				return false;
+			
+		}
+		return true;
 	}
 
 	public void moveBall(int goX, int goY) {

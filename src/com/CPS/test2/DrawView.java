@@ -8,7 +8,6 @@ import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.ContextMenu;
 import android.view.GestureDetector;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,6 +15,7 @@ import android.view.View;
 public class DrawView extends View {
 	static ColorBall[] colorballs = new ColorBall[10]; // array that holds the
 														// balls
+	Graph theGraph = new Graph();//initialize the graph
 	static int balID = 0; // variable to know what ball is being dragged
 	static int fromBalID = 0;
 	static int toBalID = 0;
@@ -35,13 +35,23 @@ public class DrawView extends View {
 		Point point = new Point();
 		point.x = 0;
 		point.y = 20;
+		theGraph.addVertex(0);    // 0  (start for dfs)
 		for (int i = 0; i < 10; i++) {
 			point.x = point.x + 50;
 
 			colorballs[i] = new ColorBall(context, R.drawable.bol_groen,
 					R.drawable.bol_rood, point);
+			theGraph.addVertex(i+1);
+			theGraph.toggleEdge(0, i+1);
 
 		}
+		paint.setDither(true);
+		paint.setColor(Color.BLACK);
+		paint.setStyle(Paint.Style.STROKE);
+		paint.setStrokeJoin(Paint.Join.ROUND);
+		paint.setStrokeCap(Paint.Cap.ROUND);
+		paint.setAntiAlias(true);
+		
 
 	}
 
@@ -59,32 +69,43 @@ public class DrawView extends View {
 			canvas.drawBitmap(MainActivity.scaledBitmap, MainActivity.matrix,
 					null);
 		}
+		 paint.setStrokeWidth(3);
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				if (colorballs[i].isLineTo(j + 1)) {
+					paint.setColor(Color.BLUE);
+					canvas.drawLine(colorballs[i].getX()+25, colorballs[i].getY()+25,
+							colorballs[j].getX()+25, colorballs[j].getY()+25, paint);
+					if(colorballs[j].isValid())
+						paint.setColor(Color.GREEN);
+					else
+						paint.setColor(Color.RED);
+					canvas.drawCircle(colorballs[j].getX()+25, colorballs[j].getY()+25, 35, paint);
+					paint.setColor(Color.YELLOW);
+					canvas.drawCircle(colorballs[i].getX()+25, colorballs[i].getY()+25, 30, paint);
+				}
+			}
+		}
+		paint.setColor(Color.BLACK);
+		 paint.setStrokeWidth(0);
+		 paint.setTextScaleX(2);
+		 paint.setTextSize(20);
 		for (int i = 0; i < 10; i++) {
 			if (MainActivity.waypoint[i]) {
 				canvas.drawBitmap(colorballs[i].getBitmap(),
 						colorballs[i].getX(), colorballs[i].getY(), null);
-
+				if(colorballs[i].getID()==10){
+					paint.setTextScaleX((float)0.9);
+				}
 				canvas.drawText(String.valueOf(colorballs[i].getID()),
-						colorballs[i].getX() + colorballs[i].getWidth() / 2,
-						colorballs[i].getY() + colorballs[i].getHeight() / 2,
+						colorballs[i].getX() + 15,
+						colorballs[i].getY() + 30,
 						paint);
 			}
 		}
-		paint.setDither(true);
-		paint.setColor(Color.BLACK);
-		paint.setStyle(Paint.Style.STROKE);
-		paint.setStrokeJoin(Paint.Join.ROUND);
-		paint.setStrokeCap(Paint.Cap.ROUND);
-		// paint.setStrokeWidth(3);
+		
 		canvas.drawText("from:" + fromBalID + ",to:" + toBalID, 500, 500, paint);
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
-				if (colorballs[i].isLineTo(j + 1)) {
-					canvas.drawLine(colorballs[i].getX()+25, colorballs[i].getY()+25,
-							colorballs[j].getX()+25, colorballs[j].getY()+25, paint);
-				}
-			}
-		}
+		
 		// canvas.drawLine(colorballs[0].getX()+25, colorballs[0].getY()+25,
 		// colorballs[1].getX()+25, colorballs[1].getY()+25, paint);
 
@@ -221,6 +242,7 @@ public class DrawView extends View {
 					toBalID = balID;
 					DoubleTapOccurredState = 0;
 					colorballs[fromBalID - 1].toggleLineTo(toBalID);
+					theGraph.toggleEdge(fromBalID, toBalID);
 
 				}
 
@@ -234,7 +256,9 @@ public class DrawView extends View {
 	@Override
 	protected void onCreateContextMenu(ContextMenu menu) {
 		// TODO Auto-generated method stub
+		
 		super.onCreateContextMenu(menu);
+		//theGraph.dfs();
 		menu.setHeaderTitle("LTL: " + computeLtl());
 		menu.add("Go to Location");
 		menu.add("Activate Sensor");
@@ -246,15 +270,24 @@ public class DrawView extends View {
 	public String computeLtl() {
 		string = "";
 		for (int i = 0; i < 10; i++) {
-			if (MainActivity.waypoint[i]) {
+			if (MainActivity.waypoint[i] && isRoot(colorballs[i].getID())) {
 				if (string == "") {
-					string = string + colorballs[i].getLtlString();
+					string = string + theGraph.dfs(colorballs[i].getID());
 				} else {
-					string = string + " && " + colorballs[i].getLtlString();
+					string = string + " && " + theGraph.dfs(colorballs[i].getID());
 				}
 			}
 		}
 		return string;
+	}
+	
+	public boolean isRoot(int index){
+		for(int i=0;i<10;i++){
+			if(colorballs[i].isLineTo(index))
+				return false;
+			
+		}
+		return true;
 	}
 
 }
