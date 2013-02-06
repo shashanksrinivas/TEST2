@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.ContextMenu;
@@ -24,7 +25,7 @@ public class DrawView extends View {
 	Paint paint = new Paint();
 	GestureDetector gestureDetector;
 	SimpleOnGestureListener listener = new SimpleOnGestureListener();
-
+	Path mPath = new Path();
 	String string = "";
 
 	public DrawView(Context context, AttributeSet attributeset) {
@@ -76,13 +77,33 @@ public class DrawView extends View {
 					paint.setColor(Color.BLUE);
 					canvas.drawLine(colorballs[i].getX()+25, colorballs[i].getY()+25,
 							colorballs[j].getX()+25, colorballs[j].getY()+25, paint);
-					if(colorballs[j].isValid())
+					
+					 float deltaX =   colorballs[j].getX()-colorballs[i].getX();
+			           float deltaY =   colorballs[j].getY()-colorballs[i].getY();
+			           float frac = (float) 0.05;
+			     float point_x_1 = colorballs[i].getX() + (float) ((1 - frac) * deltaX*0.8 + frac* 0.5 * deltaY);
+			     float point_y_1 = colorballs[i].getY() + (float) ((1 - frac) * deltaY*0.8 - frac* 0.5 * deltaX);
+			           float point_x_2 = colorballs[j].getX();
+			           float point_y_2 = colorballs[j].getY();
+			     float point_x_3 = colorballs[i].getX() + (float) ((1 - frac) * deltaX*0.8 - frac* 0.5 * deltaY);
+			     float point_y_3 = colorballs[i].getY() + (float) ((1 - frac) * deltaY*0.8 + frac* 0.5 * deltaX);
+			     
+			           mPath.moveTo((point_x_1)+25, (point_y_1)+25);
+			           mPath.lineTo((point_x_2)+25, (point_y_2)+25);
+			           mPath.lineTo((point_x_3)+25, (point_y_3)+25);
+			           mPath.lineTo((point_x_1)+25, (point_y_1)+25);
+			          // mPath.lineTo(point_x_1+ 25, point_y_1+ 25);
+			            paint.setStyle(Paint.Style.FILL);
+			            canvas.drawPath(mPath, paint);
+			            mPath.reset();
+					
+					/*if(colorballs[j].isValid())
 						paint.setColor(Color.GREEN);
 					else
 						paint.setColor(Color.RED);
 					canvas.drawCircle(colorballs[j].getX()+25, colorballs[j].getY()+25, 35, paint);
 					paint.setColor(Color.YELLOW);
-					canvas.drawCircle(colorballs[i].getX()+25, colorballs[i].getY()+25, 30, paint);
+					canvas.drawCircle(colorballs[i].getX()+25, colorballs[i].getY()+25, 30, paint)*/;
 				}
 			}
 		}
