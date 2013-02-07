@@ -2,6 +2,9 @@ package com.CPS.test2;
 
 
 
+import java.io.IOException;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
@@ -24,6 +28,13 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.dropbox.sync.android.DbxAccountManager;
+import com.dropbox.sync.android.DbxFile;
+import com.dropbox.sync.android.DbxFileInfo;
+import com.dropbox.sync.android.DbxFileSystem;
+import com.dropbox.sync.android.DbxPath;
 
 public class MainActivity extends Activity implements OnCheckedChangeListener{
 	
@@ -40,6 +51,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener{
 	  static boolean mapSelected = false;
 	public Spinner spinnerWaypoint;
 	public static int numWaypoints=10;
+	static String finalLtlString;
 	
 	CheckBox wayPoint1;
 	CheckBox wayPoint2;
@@ -53,6 +65,16 @@ public class MainActivity extends Activity implements OnCheckedChangeListener{
 	CheckBox wayPoint10;
 	
 	static boolean waypoint[] = new boolean[10];//keeps the status of waypoints (enabled/disabled)
+	
+	//dropbox related allocations 
+	private DbxAccountManager mDbxAcctMgr;
+	private static final String appKey = "tn5f6p81w07x0ub";
+    private static final String appSecret = "f7k1s51qnvrszks";
+    private static final int REQUEST_LINK_TO_DBX = 0;
+
+    private TextView mTestOutput;
+    private Button mLinkButton;
+    private Button mUploadStringButton;
 	
 	
 	
@@ -111,6 +133,26 @@ public class MainActivity extends Activity implements OnCheckedChangeListener{
 				
 			}
         });
+        
+        mTestOutput = (TextView) findViewById(R.id.ltlTextView);
+        mLinkButton = (Button) findViewById(R.id.transferLTL);
+        mLinkButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickLinkToDropbox();
+            }
+        });
+        
+        mUploadStringButton = (Button) findViewById(R.id.uploadLTL);
+        mUploadStringButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				doUpload();
+				
+			}
+		});
+        mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(), appKey, appSecret);
        
     }
     @Override
@@ -141,6 +183,14 @@ public class MainActivity extends Activity implements OnCheckedChangeListener{
     protected void onActivityResult(int requestCode, int resultCode,
     	      Intent intent) {
     	    super.onActivityResult(requestCode, resultCode, intent);
+    	    
+    	    if (requestCode == REQUEST_LINK_TO_DBX) {
+                if (resultCode == Activity.RESULT_OK) {
+                    doDropboxTest();
+                } else {
+                    mTestOutput.setText("Link to Dropbox failed or was cancelled.");
+                }
+            } 
 
     	    if (resultCode == RESULT_OK) {
     	      Uri imageFileUri = intent.getData();
@@ -169,6 +219,8 @@ public class MainActivity extends Activity implements OnCheckedChangeListener{
     	        Log.v("ERROR", e.toString());
     	      }
     	    }
+    	    
+    	    
     	  }
 
     @Override
@@ -213,6 +265,136 @@ public class MainActivity extends Activity implements OnCheckedChangeListener{
 		}
 		
 	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (mDbxAcctMgr.hasLinkedAccount()) {
+		    showLinkedView();
+		    doDropboxTest();
+		} else {
+			showUnlinkedView();
+		}
+	}
+
+    private void showLinkedView() {
+        mLinkButton.setVisibility(View.GONE);
+        mTestOutput.setVisibility(View.VISIBLE);
+        mUploadStringButton.setVisibility(View.VISIBLE);
+    }
+
+    private void showUnlinkedView() {
+        mLinkButton.setVisibility(View.VISIBLE);
+        mTestOutput.setVisibility(View.GONE);
+        mUploadStringButton.setVisibility(View.GONE);
+    }
+
+    private void onClickLinkToDropbox() {
+        mDbxAcctMgr.startLink(this, REQUEST_LINK_TO_DBX);
+    }
+
+   
+
+    private void doDropboxTest() {
+        try {
+            final String TEST_DATA = finalLtlString;
+            final String TEST_FILE_NAME = "ltl_string.txt";
+            DbxPath testPath = new DbxPath(DbxPath.ROOT, TEST_FILE_NAME);
+
+            // Create DbxFileSystem for synchronized file access.
+            DbxFileSystem dbxFs = DbxFileSystem.forAccount(mDbxAcctMgr.getLinkedAccount());
+
+            // Print the contents of the root folder.  This will block until we can
+            // sync metadata the first time.
+            List<DbxFileInfo> infos = dbxFs.listFolder(DbxPath.ROOT);
+            mTestOutput.setText("\nContents of app folder:\n");
+            for (DbxFileInfo info : infos) {
+                mTestOutput.append("    " + info.path + ", " + info.modifiedTime + '\n');
+            }
+
+            // Create a test file only if it doesn't already exist.
+            
+            if (!dbxFs.exists(testPath)) {
+            	DbxFile testFile = dbxFs.create(testPath);
+            
+                try {
+                    testFile.writeString(TEST_DATA);
+                } finally {
+                    testFile.close();
+                }
+                mTestOutput.append("\nCreated new file '" + testPath + "'.\n");
+            }
+          /*  else if (dbxFs.exists(testPath)) {
+            	
+            	DbxFile testFile = dbxFs.create(testPath);
+            
+                try {
+                    testFile.writeString(TEST_DATA);
+                } finally {
+                    testFile.close();
+                }
+                //mTestOutput.append("\nCreated new file '" + testPath + "'.\n");
+            }*/
+            
+          /*  if (dbxFs.isFile(testPath)){
+            	DbxFile testFile = dbxFs.open(testPath);
+            	 try {
+                     testFile.writeString(TEST_DATA);
+                 } finally {
+                     testFile.close();
+                 }
+            }
+            */
+
+            // Read and print the contents of test file.  Since we're not making
+            // any attempt to wait for the latest version, this may print an
+            // older cached version.  Use getSyncStatus() and/or a listener to
+            // check for a new version.
+            if (dbxFs.isFile(testPath)) {
+                String resultData;
+                DbxFile testFile = dbxFs.open(testPath);
+                try {
+                    resultData = testFile.readString();
+                    //testFile.writeString(TEST_DATA);
+                } finally {
+                    testFile.close();
+                }
+                mTestOutput.append("\nRead file '" + testPath + "' and got data:\n    " + resultData);
+            } else if (dbxFs.isFolder(testPath)) {
+                mTestOutput.append("'" + testPath.toString() + "' is a folder.\n");
+            }
+        } catch (IOException e) {
+            mTestOutput.setText("Dropbox test failed: " + e);
+        }
+    }
+    
+    private void doUpload() {
+        try {
+        	mTestOutput.setText("");
+        	String length = "" + finalLtlString.length();
+            final String TEST_DATA = length + "\n" + finalLtlString;
+            
+            final String TEST_FILE_NAME = "ltl_string.txt";
+            DbxPath testPath = new DbxPath(DbxPath.ROOT, TEST_FILE_NAME);
+
+            // Create DbxFileSystem for synchronized file access.
+            DbxFileSystem dbxFs = DbxFileSystem.forAccount(mDbxAcctMgr.getLinkedAccount());
+            
+            if (dbxFs.exists(testPath)) {
+            	
+            	DbxFile testFile = dbxFs.open(testPath);
+            
+                try {
+                    testFile.writeString(TEST_DATA);
+                } finally {
+                    testFile.close();
+                }
+                //mTestOutput.append("\nCreated new file '" + testPath + "'.\n");
+            }
+        }catch (IOException e) {
+            mTestOutput.setText("Dropbox test failed: " + e);
+        }
+    }
 
 	
     

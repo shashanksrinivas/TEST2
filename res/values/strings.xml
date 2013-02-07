@@ -21,5 +21,7 @@
     </string-array>
     
     <string name="waypoint_prompt">select</string>
+    <string name="transfer_ltl">Upload LTL</string>
+    <string name="upload_ltl">Upload LTL</string>
 
 </resources>

@@ -16,7 +16,7 @@ import android.view.View;
 public class DrawView extends View {
 	static ColorBall[] colorballs = new ColorBall[10]; // array that holds the
 														// balls
-	Graph theGraph = new Graph();//initialize the graph
+	Graph theGraph = new Graph();// initialize the graph
 	static int balID = 0; // variable to know what ball is being dragged
 	static int fromBalID = 0;
 	static int toBalID = 0;
@@ -36,14 +36,14 @@ public class DrawView extends View {
 		Point point = new Point();
 		point.x = 0;
 		point.y = 20;
-		theGraph.addVertex(0);    // 0  (start for dfs)
+		theGraph.addVertex(0); // 0 (start for dfs)
 		for (int i = 0; i < 10; i++) {
 			point.x = point.x + 50;
 
 			colorballs[i] = new ColorBall(context, R.drawable.bol_groen,
 					R.drawable.bol_rood, point);
-			theGraph.addVertex(i+1);
-			theGraph.toggleEdge(0, i+1);
+			theGraph.addVertex(i + 1);
+			theGraph.toggleEdge(0, i + 1);
 
 		}
 		paint.setDither(true);
@@ -52,7 +52,6 @@ public class DrawView extends View {
 		paint.setStrokeJoin(Paint.Join.ROUND);
 		paint.setStrokeCap(Paint.Cap.ROUND);
 		paint.setAntiAlias(true);
-		
 
 	}
 
@@ -70,63 +69,74 @@ public class DrawView extends View {
 			canvas.drawBitmap(MainActivity.scaledBitmap, MainActivity.matrix,
 					null);
 		}
-		 paint.setStrokeWidth(3);
+		paint.setStrokeWidth(3);
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				if (colorballs[i].isLineTo(j + 1)) {
 					paint.setColor(Color.BLUE);
-					canvas.drawLine(colorballs[i].getX()+25, colorballs[i].getY()+25,
-							colorballs[j].getX()+25, colorballs[j].getY()+25, paint);
-					
-					 float deltaX =   colorballs[j].getX()-colorballs[i].getX();
-			           float deltaY =   colorballs[j].getY()-colorballs[i].getY();
-			           float frac = (float) 0.05;
-			     float point_x_1 = colorballs[i].getX() + (float) ((1 - frac) * deltaX*0.8 + frac* 0.5 * deltaY);
-			     float point_y_1 = colorballs[i].getY() + (float) ((1 - frac) * deltaY*0.8 - frac* 0.5 * deltaX);
-			           float point_x_2 = colorballs[j].getX();
-			           float point_y_2 = colorballs[j].getY();
-			     float point_x_3 = colorballs[i].getX() + (float) ((1 - frac) * deltaX*0.8 - frac* 0.5 * deltaY);
-			     float point_y_3 = colorballs[i].getY() + (float) ((1 - frac) * deltaY*0.8 + frac* 0.5 * deltaX);
-			     
-			           mPath.moveTo((point_x_1)+25, (point_y_1)+25);
-			           mPath.lineTo((point_x_2)+25, (point_y_2)+25);
-			           mPath.lineTo((point_x_3)+25, (point_y_3)+25);
-			           mPath.lineTo((point_x_1)+25, (point_y_1)+25);
-			          // mPath.lineTo(point_x_1+ 25, point_y_1+ 25);
-			            paint.setStyle(Paint.Style.FILL);
-			            canvas.drawPath(mPath, paint);
-			            mPath.reset();
-					
-					/*if(colorballs[j].isValid())
-						paint.setColor(Color.GREEN);
-					else
-						paint.setColor(Color.RED);
-					canvas.drawCircle(colorballs[j].getX()+25, colorballs[j].getY()+25, 35, paint);
-					paint.setColor(Color.YELLOW);
-					canvas.drawCircle(colorballs[i].getX()+25, colorballs[i].getY()+25, 30, paint)*/;
+					canvas.drawLine(colorballs[i].getX() + 25,
+							colorballs[i].getY() + 25,
+							colorballs[j].getX() + 25,
+							colorballs[j].getY() + 25, paint);
+
+					float deltaX = colorballs[j].getX() - colorballs[i].getX();
+					float deltaY = colorballs[j].getY() - colorballs[i].getY();
+					float frac = (float) 0.05;
+					float point_x_1 = colorballs[i].getX()
+							+ (float) ((1 - frac) * deltaX * 0.8 + frac * 0.5
+									* deltaY);
+					float point_y_1 = colorballs[i].getY()
+							+ (float) ((1 - frac) * deltaY * 0.8 - frac * 0.5
+									* deltaX);
+					float point_x_2 = colorballs[j].getX();
+					float point_y_2 = colorballs[j].getY();
+					float point_x_3 = colorballs[i].getX()
+							+ (float) ((1 - frac) * deltaX * 0.8 - frac * 0.5
+									* deltaY);
+					float point_y_3 = colorballs[i].getY()
+							+ (float) ((1 - frac) * deltaY * 0.8 + frac * 0.5
+									* deltaX);
+
+					mPath.moveTo((point_x_1) + 25, (point_y_1) + 25);
+					mPath.lineTo((point_x_2) + 25, (point_y_2) + 25);
+					mPath.lineTo((point_x_3) + 25, (point_y_3) + 25);
+					mPath.lineTo((point_x_1) + 25, (point_y_1) + 25);
+
+					paint.setStyle(Paint.Style.FILL);
+					canvas.drawPath(mPath, paint);
+					mPath.reset();
+
+					/*
+					 * if(colorballs[j].isValid()) paint.setColor(Color.GREEN);
+					 * else paint.setColor(Color.RED);
+					 * canvas.drawCircle(colorballs[j].getX()+25,
+					 * colorballs[j].getY()+25, 35, paint);
+					 * paint.setColor(Color.YELLOW);
+					 * canvas.drawCircle(colorballs[i].getX()+25,
+					 * colorballs[i].getY()+25, 30, paint)
+					 */;
 				}
 			}
 		}
 		paint.setColor(Color.BLACK);
-		 paint.setStrokeWidth(0);
-		 paint.setTextScaleX(2);
-		 paint.setTextSize(20);
+		paint.setStrokeWidth(0);
+		paint.setTextScaleX(2);
+		paint.setTextSize(20);
 		for (int i = 0; i < 10; i++) {
 			if (MainActivity.waypoint[i]) {
 				canvas.drawBitmap(colorballs[i].getBitmap(),
 						colorballs[i].getX(), colorballs[i].getY(), null);
-				if(colorballs[i].getID()==10){
-					paint.setTextScaleX((float)0.9);
+				if (colorballs[i].getID() == 10) {
+					paint.setTextScaleX((float) 0.9);
 				}
 				canvas.drawText(String.valueOf(colorballs[i].getID()),
-						colorballs[i].getX() + 15,
-						colorballs[i].getY() + 30,
+						colorballs[i].getX() + 15, colorballs[i].getY() + 30,
 						paint);
 			}
 		}
-		
+
 		canvas.drawText("from:" + fromBalID + ",to:" + toBalID, 500, 500, paint);
-		
+
 		// canvas.drawLine(colorballs[0].getX()+25, colorballs[0].getY()+25,
 		// colorballs[1].getX()+25, colorballs[1].getY()+25, paint);
 
@@ -277,9 +287,10 @@ public class DrawView extends View {
 	@Override
 	protected void onCreateContextMenu(ContextMenu menu) {
 		// TODO Auto-generated method stub
-		
+
 		super.onCreateContextMenu(menu);
-		//theGraph.dfs();
+		// theGraph.dfs();
+		MainActivity.finalLtlString=computeLtl();
 		menu.setHeaderTitle("LTL: " + computeLtl());
 		menu.add("Go to Location");
 		menu.add("Activate Sensor");
@@ -295,18 +306,19 @@ public class DrawView extends View {
 				if (string == "") {
 					string = string + theGraph.dfs(colorballs[i].getID());
 				} else {
-					string = string + " && " + theGraph.dfs(colorballs[i].getID());
+					string = string + " && "
+							+ theGraph.dfs(colorballs[i].getID());
 				}
 			}
 		}
 		return string;
 	}
-	
-	public boolean isRoot(int index){
-		for(int i=0;i<10;i++){
-			if(colorballs[i].isLineTo(index))
+
+	public boolean isRoot(int index) {
+		for (int i = 0; i < 10; i++) {
+			if (colorballs[i].isLineTo(index))
 				return false;
-			
+
 		}
 		return true;
 	}
