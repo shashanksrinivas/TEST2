@@ -20,7 +20,10 @@ public class DrawView extends View {
 	static int balID = 0; // variable to know what ball is being dragged
 	static int fromBalID = 0;
 	static int toBalID = 0;
+	static int fromBalIDSingleTap = 0;
+	static int toBalIDSingleTap = 0;
 	private int DoubleTapOccurredState = 0;
+	private int orGoToState = 0;
 	// private boolean secondDoubleTapOccurred = false;
 	Paint paint = new Paint();
 	GestureDetector gestureDetector;
@@ -70,9 +73,23 @@ public class DrawView extends View {
 					null);
 		}
 		paint.setStrokeWidth(3);
+		canvas.drawLine(0, 0, 0, 800, paint);
+		
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				if (colorballs[i].isLineTo(j + 1)) {
+				if (colorballs[i].isLineTo(j + 1) && MainActivity.waypoint[i]) {
+					paint.setColor(Color.CYAN);
+					canvas.drawLine(colorballs[i].getX() + 25,
+							colorballs[i].getY() + 25,
+							colorballs[j].getX() + 25,
+							colorballs[j].getY() + 25, paint);
+				}
+			}
+		}
+		
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				if (colorballs[i].isArrowTo(j + 1) && MainActivity.waypoint[i]) {
 					paint.setColor(Color.BLUE);
 					canvas.drawLine(colorballs[i].getX() + 25,
 							colorballs[i].getY() + 25,
@@ -139,6 +156,7 @@ public class DrawView extends View {
 
 		// canvas.drawLine(colorballs[0].getX()+25, colorballs[0].getY()+25,
 		// colorballs[1].getX()+25, colorballs[1].getY()+25, paint);
+		invalidate();
 
 	}
 
@@ -252,11 +270,24 @@ public class DrawView extends View {
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e) {
 			if (balID > 0) {
+				/*DrawView.fromBalIDSingleTap = balID;
 				if (colorballs[balID - 1].isValid()) {
 					colorballs[balID - 1].setValid(false);
 				} else {
 					colorballs[balID - 1].setValid(true);
+				}*/
+				if (orGoToState == 0) {
+					fromBalIDSingleTap = balID;
+					orGoToState = 1;
+				} else if (orGoToState == 1) {
+					toBalIDSingleTap = balID;
+					orGoToState = 0;
+					colorballs[fromBalIDSingleTap - 1].toggleLineTo(toBalIDSingleTap);
+					colorballs[toBalIDSingleTap - 1].toggleLineTo(fromBalIDSingleTap);
+					//theGraph.toggleEdge(fromBalID, toBalID);
+
 				}
+				
 			}
 			invalidate();
 			return true;
@@ -272,11 +303,16 @@ public class DrawView extends View {
 				} else if (DoubleTapOccurredState == 1) {
 					toBalID = balID;
 					DoubleTapOccurredState = 0;
-					colorballs[fromBalID - 1].toggleLineTo(toBalID);
+					colorballs[fromBalID - 1].toggleArrowTo(toBalID);
+					
 					theGraph.toggleEdge(fromBalID, toBalID);
 
 				}
+				
 
+			}
+			else{
+				DoubleTapOccurredState = 0;
 			}
 
 			return true;
@@ -292,7 +328,7 @@ public class DrawView extends View {
 		// theGraph.dfs();
 		MainActivity.finalLtlString=computeLtl();
 		menu.setHeaderTitle("LTL: " + computeLtl());
-		menu.add("Go to Location");
+		menu.add("Toggle Location");
 		menu.add("Activate Sensor");
 		menu.add("Deactivate Sensor");
 		menu.add("Pick up Object");
@@ -306,8 +342,18 @@ public class DrawView extends View {
 				if (string == "") {
 					string = string + theGraph.dfs(colorballs[i].getID());
 				} else {
+					boolean or = false;
+					for(int j=0;j<10;j++){
+					if(colorballs[i].isLineTo(j+1))
+						or = true;
+					}
+					if(!or)
 					string = string + " && "
 							+ theGraph.dfs(colorballs[i].getID());
+					else
+						string = string + " || "
+								+ theGraph.dfs(colorballs[i].getID());
+						
 				}
 			}
 		}
@@ -316,7 +362,7 @@ public class DrawView extends View {
 
 	public boolean isRoot(int index) {
 		for (int i = 0; i < 10; i++) {
-			if (colorballs[i].isLineTo(index))
+			if (colorballs[i].isArrowTo(index))
 				return false;
 
 		}

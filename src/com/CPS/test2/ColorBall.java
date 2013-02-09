@@ -15,6 +15,7 @@ public class ColorBall {
 	private static int count = 1;
 	private boolean goRight = true;
 	private boolean goDown = true;
+	private boolean arrowTo[] = new boolean[10];
 	private boolean lineTo[] = new boolean[10];
 	private boolean valid = true;
 	private boolean pickObject = false;
@@ -110,16 +111,24 @@ public class ColorBall {
 		enabled = false;
 	}
 
+	public void toggleArrowTo(int i) {
+		arrowTo[i - 1] = !arrowTo[i - 1];
+	}
+
+	public boolean isArrowTo(int i) {
+		return arrowTo[i - 1];
+	}
+
+	public void unsetArrowTo(int i) {
+		arrowTo[i - 1] = false;
+	}
+	
 	public void toggleLineTo(int i) {
 		lineTo[i - 1] = !lineTo[i - 1];
 	}
-
+	
 	public boolean isLineTo(int i) {
 		return lineTo[i - 1];
-	}
-
-	public void unsetLineTo(int i) {
-		lineTo[i - 1] = false;
 	}
 
 	public boolean isValid() {
@@ -209,7 +218,7 @@ public class ColorBall {
 	
 	public boolean isLeaf(){
 		for(int i=0;i<10;i++){
-			if(isLineTo(i))
+			if(isArrowTo(i))
 				return false;
 			
 		}

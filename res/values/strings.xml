@@ -23,5 +23,7 @@
     <string name="waypoint_prompt">select</string>
     <string name="transfer_ltl">Upload LTL</string>
     <string name="upload_ltl">Upload LTL</string>
+    <string name="add_mission">Add Mission</string>
+    <string name="del_mission">Del Mission</string>
 
 </resources>

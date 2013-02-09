@@ -16,6 +16,18 @@
             android:layout_height="wrap_content"
             android:text="@string/select_map" />
         
+        <Button
+            android:id="@+id/addMission"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_mission" />
+        
+        <Button
+            android:id="@+id/delMission"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/del_mission" />
+        
          <Button
             android:id="@+id/transferLTL"
             android:layout_width="wrap_content"
@@ -28,18 +40,7 @@
             android:layout_height="wrap_content"
             android:text="@string/upload_ltl" />
 
-        <TextView
-            
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/number_waypoints" />
-
-        <Spinner
-            android:id="@+id/spinnerWaypoint"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:entries="@array/number_waypoints"
-            android:prompt="@string/waypoint_prompt" />
+       
     
 
     <CheckBox
@@ -114,15 +115,22 @@
     
     </LinearLayout>
     
-    <TextView
-        android:id="@+id/ltlTextView"
+     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+    
+    
+    <TextView
+        android:id="@+id/ltlTextView"
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
         android:text="hello" />
 
     <com.CPS.test2.DrawView
         android:id="@+id/draw_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    </LinearLayout>
 
 </LinearLayout>
