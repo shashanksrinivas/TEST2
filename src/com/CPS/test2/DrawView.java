@@ -1,5 +1,7 @@
 package com.CPS.test2;
 
+import java.util.LinkedList;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -74,7 +76,7 @@ public class DrawView extends View {
 		}
 		paint.setStrokeWidth(3);
 		canvas.drawLine(0, 0, 0, 800, paint);
-		
+
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				if (colorballs[i].isLineTo(j + 1) && MainActivity.waypoint[i]) {
@@ -86,7 +88,7 @@ public class DrawView extends View {
 				}
 			}
 		}
-		
+
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				if (colorballs[i].isArrowTo(j + 1) && MainActivity.waypoint[i]) {
@@ -270,24 +272,25 @@ public class DrawView extends View {
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e) {
 			if (balID > 0) {
-				/*DrawView.fromBalIDSingleTap = balID;
-				if (colorballs[balID - 1].isValid()) {
-					colorballs[balID - 1].setValid(false);
-				} else {
-					colorballs[balID - 1].setValid(true);
-				}*/
+				/*
+				 * DrawView.fromBalIDSingleTap = balID; if (colorballs[balID -
+				 * 1].isValid()) { colorballs[balID - 1].setValid(false); } else
+				 * { colorballs[balID - 1].setValid(true); }
+				 */
 				if (orGoToState == 0) {
 					fromBalIDSingleTap = balID;
 					orGoToState = 1;
 				} else if (orGoToState == 1) {
 					toBalIDSingleTap = balID;
 					orGoToState = 0;
-					colorballs[fromBalIDSingleTap - 1].toggleLineTo(toBalIDSingleTap);
-					colorballs[toBalIDSingleTap - 1].toggleLineTo(fromBalIDSingleTap);
-					//theGraph.toggleEdge(fromBalID, toBalID);
+					colorballs[fromBalIDSingleTap - 1]
+							.toggleLineTo(toBalIDSingleTap);
+					colorballs[toBalIDSingleTap - 1]
+							.toggleLineTo(fromBalIDSingleTap);
+					// theGraph.toggleEdge(fromBalID, toBalID);
 
 				}
-				
+
 			}
 			invalidate();
 			return true;
@@ -304,14 +307,12 @@ public class DrawView extends View {
 					toBalID = balID;
 					DoubleTapOccurredState = 0;
 					colorballs[fromBalID - 1].toggleArrowTo(toBalID);
-					
+
 					theGraph.toggleEdge(fromBalID, toBalID);
 
 				}
-				
 
-			}
-			else{
+			} else {
 				DoubleTapOccurredState = 0;
 			}
 
@@ -326,7 +327,7 @@ public class DrawView extends View {
 
 		super.onCreateContextMenu(menu);
 		// theGraph.dfs();
-		MainActivity.finalLtlString=computeLtl();
+		MainActivity.finalLtlString = computeLtl();
 		menu.setHeaderTitle("LTL: " + computeLtl());
 		menu.add("Toggle Location");
 		menu.add("Activate Sensor");
@@ -336,27 +337,60 @@ public class DrawView extends View {
 	}
 
 	public String computeLtl() {
+		LinkedList<String> orStrings = new LinkedList<String>();
+		LinkedList<String> andStrings = new LinkedList<String>();
 		string = "";
 		for (int i = 0; i < 10; i++) {
 			if (MainActivity.waypoint[i] && isRoot(colorballs[i].getID())) {
-				if (string == "") {
-					string = string + theGraph.dfs(colorballs[i].getID());
-				} else {
-					boolean or = false;
-					for(int j=0;j<10;j++){
-					if(colorballs[i].isLineTo(j+1))
+				/*
+				 * if (string == "") { string = string +
+				 * theGraph.dfs(colorballs[i].getID()); } else {
+				 */
+				boolean or = false;
+				for (int j = 0; j < 10; j++) {
+					if (colorballs[i].isLineTo(j + 1))
 						or = true;
-					}
-					if(!or)
-					string = string + " && "
-							+ theGraph.dfs(colorballs[i].getID());
-					else
-						string = string + " || "
-								+ theGraph.dfs(colorballs[i].getID());
-						
+				}
+
+				if (or) {
+					orStrings.add(theGraph.dfs(colorballs[i].getID()));
+				} else {
+					andStrings.add(theGraph.dfs(colorballs[i].getID()));
 				}
 			}
 		}
+		for (String s : andStrings) {
+			if (string == "") {
+				string = s;
+			} else {
+				if (!s.isEmpty()) {
+					string = string + " && " + s;
+				}
+			}
+
+		}
+		if (!string.isEmpty())
+			string = "(" + string + ")";
+		String stringtemp = string;
+		string = "";
+		for (String s : orStrings) {
+			if (string == "") {
+				string = s;
+			} else {
+				if (!s.isEmpty()) {
+					string = string + " || " + s;
+				}
+			}
+
+		}
+		if (!string.isEmpty())
+			string = "(" + string + ")";
+		if (!stringtemp.isEmpty() && !string.isEmpty()) {
+			string = stringtemp + " && " + string;
+		}else if(string.isEmpty()){
+			string = stringtemp;
+		}
+
 		return string;
 	}
 
