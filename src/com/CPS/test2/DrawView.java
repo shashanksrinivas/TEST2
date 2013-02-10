@@ -189,7 +189,7 @@ public class DrawView extends View {
 
 				// if the radius is smaller then 23 (radius of a ball is 22),
 				// then it must be on the ball
-				if (radCircle < 23) {
+				if (radCircle < 60) {
 					balID = colorballs[i].getID();
 					break;
 				}

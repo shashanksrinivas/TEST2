@@ -34,6 +34,13 @@ class StackX {
 		return st[top];
 	}
 
+	public int peekPrev()// peek the top - 1 element in the stack
+	{
+		if (top > 0)
+			return st[top - 1];
+		return st[top];
+	}
+
 	// ------------------------------------------------------------
 	public boolean isEmpty() // true if nothing on stack
 	{
@@ -102,37 +109,42 @@ class Graph {
 	{ // begin at vertex 0
 		vertexList[balID].wasVisited = true; // mark it
 		String ltlString = "";
-		String mainString = "";
-		boolean popFlag=false;
+		//String mainString = "";
+		boolean popFlag = false;
 		
-		if (DrawView.colorballs[balID -1].isPickObject()) {
-			ltlString = !ltlString.isEmpty()?ltlString + " && F( PickObj )":"F( PickObj )";
-			}
-			if (DrawView.colorballs[balID -1].isActivateSensor()) {
-				ltlString = !ltlString.isEmpty()?ltlString + " && F( ActSen )":"F( ActSen )";
-			}
-			if (DrawView.colorballs[balID -1].isDropObject()) {
-				ltlString = !ltlString.isEmpty()?ltlString + " && F( DropObj )":"F( DropObj )";
-			}
-			if (DrawView.colorballs[balID -1].isDeactivateSensor()) {
-				ltlString = !ltlString.isEmpty()?ltlString + " && F( DeactSen )":"F( DeactSen )";
-			}
-			
-		
-			
-		
-		if(DrawView.colorballs[balID -1].isPickObject() || DrawView.colorballs[balID -1].isDropObject() || DrawView.colorballs[balID -1].isActivateSensor() || DrawView.colorballs[balID -1].isDeactivateSensor()){
+
+		if (DrawView.colorballs[balID - 1].isPickObject()) {
+			ltlString = !ltlString.isEmpty() ? ltlString + " && F( PickObj )"
+					: "F( PickObj )";
+		}
+		if (DrawView.colorballs[balID - 1].isActivateSensor()) {
+			ltlString = !ltlString.isEmpty() ? ltlString + " && F( ActSen )"
+					: "F( ActSen )";
+		}
+		if (DrawView.colorballs[balID - 1].isDropObject()) {
+			ltlString = !ltlString.isEmpty() ? ltlString + " && F( DropObj )"
+					: "F( DropObj )";
+		}
+		if (DrawView.colorballs[balID - 1].isDeactivateSensor()) {
+			ltlString = !ltlString.isEmpty() ? ltlString + " && F( DeactSen )"
+					: "F( DeactSen )";
+		}
+
+		if (DrawView.colorballs[balID - 1].isPickObject()
+				|| DrawView.colorballs[balID - 1].isDropObject()
+				|| DrawView.colorballs[balID - 1].isActivateSensor()
+				|| DrawView.colorballs[balID - 1].isDeactivateSensor()) {
 			ltlString = " U( " + ltlString + ")";
 		}
-		
+
 		ltlString = balID + ltlString;
-		
-		if (!DrawView.colorballs[balID-1].isValid()) {
-			ltlString = "G NOT(" + ltlString + ".)";
+
+		if (!DrawView.colorballs[balID - 1].isValid()) {
+			ltlString = "G (NOT(" + ltlString + ".))";
 		} else {
-			if(!DrawView.colorballs[balID - 1].isAlways()){
-			ltlString = "F(" + ltlString + ".)";
-			}else{
+			if (!DrawView.colorballs[balID - 1].isAlways()) {
+				ltlString = "F(" + ltlString + ".)";
+			} else {
 				ltlString = "GF(" + ltlString + ".)";
 			}
 		}
@@ -143,57 +155,68 @@ class Graph {
 			// get an unvisited vertex adjacent to stack top
 			int v = getAdjUnvisitedVertex(theStack.peek());
 			if (v == -1) {// if no such vertex,
-				//if(!(mainString=="")){
-					//mainString = mainString + " && " + ltlString;
-					//}
-				//else
-					//mainString = ltlString;
-				//vertexList[theStack.peek()].wasVisited = true;
-				popFlag=true;
+				// if(!(mainString=="")){
+				// mainString = mainString + " && " + ltlString;
+				// }
+				// else
+				// mainString = ltlString;
+				// vertexList[theStack.peek()].wasVisited = true;
+				popFlag = true;
 				theStack.pop();
-			}
-			else // if it exists,
+			} else // if it exists,
 			{
 				vertexList[v].wasVisited = true; // mark it
-				String[] splitStrings=ltlString.split("\\.");
-				String tempString="";
-				
-				if (DrawView.colorballs[v -1].isPickObject()) {
-					tempString = !tempString.isEmpty()?tempString + " && F( PickObj )":"F( PickObj )";
-					}
-					if (DrawView.colorballs[v -1].isActivateSensor()) {
-						tempString = !tempString.isEmpty()?tempString + " && F( ActSen )":"F( ActSen )";
-					}
-					if (DrawView.colorballs[v -1].isDropObject()) {
-						tempString = !tempString.isEmpty()?tempString + " && F( DropObj )":"F( DropObj )";
-					}
-					if (DrawView.colorballs[v -1].isDeactivateSensor()) {
-						tempString = !tempString.isEmpty()?tempString + " && F( DeactSen )":"F( DeactSen )";
-					}
-					
-				
-					
-				
-				if(DrawView.colorballs[v -1].isPickObject() || DrawView.colorballs[v -1].isDropObject() || DrawView.colorballs[v -1].isActivateSensor() || DrawView.colorballs[v -1].isDeactivateSensor()){
+				String[] splitStrings = ltlString.split("\\.");
+				String tempString = "";
+
+				if (DrawView.colorballs[v - 1].isPickObject()) {
+					tempString = !tempString.isEmpty() ? tempString
+							+ " && F( PickObj )" : "F( PickObj )";
+				}
+				if (DrawView.colorballs[v - 1].isActivateSensor()) {
+					tempString = !tempString.isEmpty() ? tempString
+							+ " && F( ActSen )" : "F( ActSen )";
+				}
+				if (DrawView.colorballs[v - 1].isDropObject()) {
+					tempString = !tempString.isEmpty() ? tempString
+							+ " && F( DropObj )" : "F( DropObj )";
+				}
+				if (DrawView.colorballs[v - 1].isDeactivateSensor()) {
+					tempString = !tempString.isEmpty() ? tempString
+							+ " && F( DeactSen )" : "F( DeactSen )";
+				}
+
+				if (DrawView.colorballs[v - 1].isPickObject()
+						|| DrawView.colorballs[v - 1].isDropObject()
+						|| DrawView.colorballs[v - 1].isActivateSensor()
+						|| DrawView.colorballs[v - 1].isDeactivateSensor()) {
 					tempString = " U( " + tempString + ")";
 				}
-				
+
 				tempString = v + tempString;
 
-				if (!DrawView.colorballs[v-1].isValid()) {
+				if (!DrawView.colorballs[v - 1].isValid()) {
 					tempString = "G NOT(" + tempString + ".)";
 				} else {
+
 					tempString = "F(" + tempString + ".)";
 				}
-				if(!popFlag){
-				ltlString = splitStrings[0] + " && " + tempString + splitStrings[1] ;
-				}else{
-					ltlString = splitStrings[0] + ") && (" + tempString + splitStrings[1];
+				if (!popFlag) {
+					//int x = theStack.peekPrev();
+					//int y = theStack.peek();
+					if (DrawView.colorballs[theStack.peek() - 1].isValid()) {
+						ltlString = splitStrings[0] + " && " + tempString
+								+ splitStrings[1];
+					} else {
+						ltlString = splitStrings[0] + ") U (" + tempString
+								+ splitStrings[1];
+					}
+				} else {
+					ltlString = splitStrings[0] + ") && (" + tempString
+							+ splitStrings[1];
 					popFlag = false;
 				}
-				
-				
-				
+
 				theStack.push(v); // push it
 			}
 		} // end while
@@ -202,8 +225,8 @@ class Graph {
 		for (int j = 0; j < nVerts; j++)
 			// reset flags
 			vertexList[j].wasVisited = false;
-		return ltlString.replace(".","");
-		//return mainString.replace(".","");
+		return ltlString.replace(".", "");
+		// return mainString.replace(".","");
 	} // end dfs
 
 	// ------------------------------------------------------------
@@ -211,8 +234,6 @@ class Graph {
 	public String getLtlString() {
 		return ltlString;
 	}
-	
-	
 
 	public int getAdjUnvisitedVertex(int v) {
 		for (int j = 0; j < nVerts; j++)
@@ -220,9 +241,8 @@ class Graph {
 				return j;
 		return -1;
 	} // end getAdjUnvisitedVertex()
-	
-	
-		// ------------------------------------------------------------
+
+	// ------------------------------------------------------------
 } // end class Graph
 // //////////////////////////////////////////////////////////////
 
