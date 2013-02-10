@@ -26,6 +26,8 @@ public class DrawView extends View {
 	static int toBalIDSingleTap = 0;
 	private int DoubleTapOccurredState = 0;
 	private int orGoToState = 0;
+	private int width;
+	private int height;
 	// private boolean secondDoubleTapOccurred = false;
 	Paint paint = new Paint();
 	GestureDetector gestureDetector;
@@ -404,4 +406,13 @@ public class DrawView extends View {
 		return true;
 	}
 
+	@Override
+	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+		// TODO Auto-generated method stub
+		super.onSizeChanged(w, h, oldw, oldh);
+	}
+
+		public int getheight(){
+			return height;
+		}
 }

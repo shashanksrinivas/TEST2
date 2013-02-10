@@ -40,7 +40,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	ImageView choosenImageView;
 	Button choosePicture;
 	Button savePicture;
-
+	DrawView dv;
 	Bitmap bmp;
 	static Bitmap scaledBitmap;
 	static Bitmap alteredBitmap;
@@ -125,7 +125,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		 * 
 		 * } });
 		 */
-		DrawView dv = (DrawView) findViewById(R.id.draw_view);
+		dv = (DrawView) findViewById(R.id.draw_view);
 		registerForContextMenu(dv);
 
 		Button buttonLoadImage = (Button) findViewById(R.id.selectMap);
@@ -254,7 +254,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 						.decodeStream(
 								getContentResolver().openInputStream(
 										imageFileUri), null, bmpFactoryOptions);
-				scaledBitmap = Bitmap.createScaledBitmap(bmp, 800, 600, true);
+				scaledBitmap = Bitmap.createScaledBitmap(bmp, dv.getWidth(), dv.getHeight(), true);
 				alteredBitmap = Bitmap.createBitmap(bmp.getWidth(),
 						bmp.getHeight(), bmp.getConfig());
 				canvas = new Canvas(alteredBitmap);
