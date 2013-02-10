@@ -17,7 +17,8 @@ public class ColorBall {
 	private boolean goDown = true;
 	private boolean arrowTo[] = new boolean[10];
 	private boolean lineTo[] = new boolean[10];
-	private boolean valid = true;
+	private boolean valid = true;//whether you can or can't visit a location
+	private boolean always = false;//for visiting infinitely often
 	private boolean pickObject = false;
 	private boolean dropObject = false;
 	private boolean activateSensor = false;
@@ -138,6 +139,14 @@ public class ColorBall {
 	public void setValid(boolean value) {
 		valid = value;
 
+	}
+	
+	public boolean isAlways() {
+		return always;
+	}
+	
+	public void toggleAlways(){
+		always = !always;
 	}
 	
 	public void setClickState(int value){

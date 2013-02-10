@@ -130,7 +130,11 @@ class Graph {
 		if (!DrawView.colorballs[balID-1].isValid()) {
 			ltlString = "G NOT(" + ltlString + ".)";
 		} else {
+			if(!DrawView.colorballs[balID - 1].isAlways()){
 			ltlString = "F(" + ltlString + ".)";
+			}else{
+				ltlString = "GF(" + ltlString + ".)";
+			}
 		}
 		theStack.push(balID); // push it
 

@@ -330,6 +330,7 @@ public class DrawView extends View {
 		MainActivity.finalLtlString = computeLtl();
 		menu.setHeaderTitle("LTL: " + computeLtl());
 		menu.add("Toggle Location");
+		menu.add("Toggle Always");
 		menu.add("Activate Sensor");
 		menu.add("Deactivate Sensor");
 		menu.add("Pick up Object");
