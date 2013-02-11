@@ -196,7 +196,7 @@ class Graph {
 				tempString = v + tempString;
 
 				if (!DrawView.colorballs[v - 1].isValid()) {
-					tempString = "G NOT(" + tempString + ".)";
+					tempString = "G (NOT(" + tempString + ".))";
 				} else {
 
 					tempString = "F(" + tempString + ".)";
