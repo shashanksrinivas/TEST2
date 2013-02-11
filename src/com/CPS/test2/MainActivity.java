@@ -217,6 +217,8 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 			
 		}else if(item.getTitle() == "Toggle Always"){
 			DrawView.colorballs[DrawView.balID - 1].toggleAlways();
+		}else if(item.getTitle() == "Toggle Eventually"){
+			DrawView.colorballs[DrawView.balID - 1].toggleEventually();
 		}
 
 		else {

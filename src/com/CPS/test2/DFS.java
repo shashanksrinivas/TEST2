@@ -143,9 +143,13 @@ class Graph {
 			ltlString = "G (NOT(" + ltlString + ".))";
 		} else {
 			if (!DrawView.colorballs[balID - 1].isAlways()) {
+				if(DrawView.colorballs[balID - 1].isEventually()){
 				ltlString = "F(" + ltlString + ".)";
+				}else{
+					ltlString = "NOT("+ generateNotString(balID, balID) + ")U(" + ltlString + ".)";
+				}
 			} else {
-				ltlString = "GF(" + ltlString + ".)";
+				ltlString = "GF(" + ltlString + ".)";//only for the root of each tree
 			}
 		}
 		theStack.push(balID); // push it
@@ -198,15 +202,24 @@ class Graph {
 				if (!DrawView.colorballs[v - 1].isValid()) {
 					tempString = "G (NOT(" + tempString + ".))";
 				} else {
+					if(!DrawView.colorballs[v-1].isEventually()){
+						tempString = "=>X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
+					}else{
 
 					tempString = "F(" + tempString + ".)";
+					}
 				}
 				if (!popFlag) {
 					//int x = theStack.peekPrev();
 					//int y = theStack.peek();
 					if (DrawView.colorballs[theStack.peek() - 1].isValid()) {
+						if(!DrawView.colorballs[v-1].isEventually()){
+							ltlString = splitStrings[0] + tempString
+									+ splitStrings[1];
+						}else{
 						ltlString = splitStrings[0] + " && " + tempString
 								+ splitStrings[1];
+						}
 					} else {
 						ltlString = splitStrings[0] + ") U (" + tempString
 								+ splitStrings[1];
@@ -233,6 +246,22 @@ class Graph {
 	// returns an unvisited vertex adj to v
 	public String getLtlString() {
 		return ltlString;
+	}
+	
+	public String generateNotString(int fromBalID, int toBalID){
+		String notString="";
+		for(int i = 0;i<10;i++){
+			int tempBalID = i+1;
+			if(i!=(fromBalID-1) && i!=(toBalID-1)){
+				if(notString==""){
+					
+					notString ="" +  tempBalID;
+				}else{
+					notString = notString + " || " + tempBalID;
+				}
+			}
+		}
+		return notString;
 	}
 
 	public int getAdjUnvisitedVertex(int v) {

@@ -333,6 +333,7 @@ public class DrawView extends View {
 		menu.setHeaderTitle("LTL: " + computeLtl());
 		menu.add("Toggle Location");
 		menu.add("Toggle Always");
+		menu.add("Toggle Eventually");
 		menu.add("Activate Sensor");
 		menu.add("Deactivate Sensor");
 		menu.add("Pick up Object");
