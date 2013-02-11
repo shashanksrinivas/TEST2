@@ -200,7 +200,12 @@ class Graph {
 				tempString = v + tempString;
 
 				if (!DrawView.colorballs[v - 1].isValid()) {
+					if(DrawView.colorballs[v-1].isEventually()){
 					tempString = "G (NOT(" + tempString + ".))";
+					}else{
+						//tempString = "G (NOT(" + tempString + ".))";//need to test it more
+						tempString = "=>X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
+					}
 				} else {
 					if(!DrawView.colorballs[v-1].isEventually()){
 						tempString = "=>X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
@@ -252,7 +257,7 @@ class Graph {
 		String notString="";
 		for(int i = 0;i<10;i++){
 			int tempBalID = i+1;
-			if(i!=(fromBalID-1) && i!=(toBalID-1)){
+			if(i!=(fromBalID-1) && i!=(toBalID-1) && MainActivity.waypoint[i]){
 				if(notString==""){
 					
 					notString ="" +  tempBalID;
