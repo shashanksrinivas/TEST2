@@ -108,6 +108,7 @@ class Graph {
 	public String dfs(int balID) // depth-first search
 	{ // begin at vertex 0
 		vertexList[balID].wasVisited = true; // mark it
+		boolean firstImplication=true;
 		String ltlString = "";
 		//String mainString = "";
 		boolean popFlag = false;
@@ -201,14 +202,33 @@ class Graph {
 
 				if (!DrawView.colorballs[v - 1].isValid()) {
 					if(DrawView.colorballs[v-1].isEventually()){
-					tempString = "G (NOT(" + tempString + ".))";
+						if(firstImplication){
+					tempString = "=>(NOT(" + tempString + ")U(" + generateNotString(theStack.peek(), v)+ ").)";
+					firstImplication = false;
+						}
+						else{
+							if(DrawView.colorballs[theStack.peek()-1].isValid()){
+							tempString = " && (NOT(" + tempString + ")U(" + generateNotString(theStack.peek(), v)+ ").)";
+							}else{
+								tempString = "(NOT(" + tempString + ")U(" + generateNotString(theStack.peek(), v)+ ").)";
+							}
+						}
 					}else{
 						//tempString = "G (NOT(" + tempString + ".))";//need to test it more
 						tempString = "=>X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
 					}
 				} else {
 					if(!DrawView.colorballs[v-1].isEventually()){
+						if(firstImplication){
+							if(DrawView.colorballs[theStack.peek()-1].isValid()){
 						tempString = "=>X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
+							}else{
+								tempString = "X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
+							}
+						firstImplication=false;
+						}else{
+							tempString = "&& X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
+						}
 					}else{
 
 					tempString = "F(" + tempString + ".)";
@@ -218,16 +238,33 @@ class Graph {
 					//int x = theStack.peekPrev();
 					//int y = theStack.peek();
 					if (DrawView.colorballs[theStack.peek() - 1].isValid()) {
-						if(!DrawView.colorballs[v-1].isEventually()){
-							ltlString = splitStrings[0] + tempString
+						if(DrawView.colorballs[v-1].isValid()){
+							if(!DrawView.colorballs[v-1].isEventually()){
+								ltlString = splitStrings[0] + tempString
 									+ splitStrings[1];
+							}else{
+								ltlString = splitStrings[0] + " && " + tempString
+										+ splitStrings[1];
+							}
 						}else{
-						ltlString = splitStrings[0] + " && " + tempString
-								+ splitStrings[1];
+							if(!DrawView.colorballs[v-1].isEventually()){
+								ltlString = splitStrings[0] + tempString//test this case
+									+ splitStrings[1];
+							}else{
+								ltlString = splitStrings[0] + tempString
+										+ splitStrings[1];
+							}
+							
 						}
 					} else {
-						ltlString = splitStrings[0] + ") U (" + tempString
+						if(!DrawView.colorballs[v-1].isEventually()){
+							ltlString = splitStrings[0] + ")=>("+ tempString
 								+ splitStrings[1];
+						}else{
+							ltlString = splitStrings[0] + ") U (" + tempString
+									+ splitStrings[1];
+						}
+						
 					}
 				} else {
 					ltlString = splitStrings[0] + ") && (" + tempString
@@ -238,7 +275,7 @@ class Graph {
 				theStack.push(v); // push it
 			}
 		} // end while
-
+firstImplication=true;
 		// stack is empty, so we're done
 		for (int j = 0; j < nVerts; j++)
 			// reset flags
@@ -253,11 +290,11 @@ class Graph {
 		return ltlString;
 	}
 	
-	public String generateNotString(int fromBalID, int toBalID){
+	public String generateNotString(int fromBalID, int toBalID){//generates the string for part of ordered locomotion
 		String notString="";
 		for(int i = 0;i<10;i++){
 			int tempBalID = i+1;
-			if(i!=(fromBalID-1) && i!=(toBalID-1) && MainActivity.waypoint[i]){
+			if( i!=(toBalID-1) && i!=(fromBalID-1) && MainActivity.waypoint[i]){
 				if(notString==""){
 					
 					notString ="" +  tempBalID;
@@ -266,6 +303,8 @@ class Graph {
 				}
 			}
 		}
+		if(notString.equals(""))
+			return "true";
 		return notString;
 	}
 

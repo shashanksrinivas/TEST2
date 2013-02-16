@@ -69,8 +69,8 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 
 	// dropbox related allocations
 	private DbxAccountManager mDbxAcctMgr;
-	private static final String appKey = "jy1f7p40xoajjh3";
-	private static final String appSecret = "xsiqq2z1wjsjd9l";
+	private static final String appKey = "6j4m2i10o3v8o6a";
+	private static final String appSecret = "n7umsheli0ppuui";
 	private static final int REQUEST_LINK_TO_DBX = 0;
 
 	private TextView mTestOutput;
