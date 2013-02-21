@@ -28,6 +28,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dropbox.sync.android.DbxAccountManager;
 import com.dropbox.sync.android.DbxFile;
@@ -52,6 +53,15 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	public static int numWaypoints = 10;
 	static String finalLtlString;
 	String hyperFinalString;
+	
+	//action id
+		private static final int ID_LOC     = 1;
+		private static final int ID_ALWAYS   = 2;
+		private static final int ID_EVENTUALLY = 3;
+		private static final int ID_PICKUP   = 4;
+		private static final int ID_DROP  = 5;	
+		private static final int ID_ACTSEN     = 6;
+		private static final int ID_DEACTSEN     = 7;
 
 	CheckBox wayPoint1;
 	CheckBox wayPoint2;
@@ -89,6 +99,83 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+/////////////////////////////////////////////////////////////////////////////////////////
+////stuff related to quick action menu
+		ActionItem toggleLocItem 	= new ActionItem(ID_LOC, "Toggle Location\n\n", getResources().getDrawable(R.drawable.toggle_loc));
+		ActionItem toggleAlwaysItem 	= new ActionItem(ID_ALWAYS, "Toggle Always", getResources().getDrawable(R.drawable.toggle_always));
+        ActionItem toggleEventuallyItem 	= new ActionItem(ID_EVENTUALLY, "Toggle Eventually", getResources().getDrawable(R.drawable.toggle_eventually));
+        ActionItem pickupItem 	= new ActionItem(ID_PICKUP, "Pickup Object", getResources().getDrawable(R.drawable.pickup_obj));
+        ActionItem dropItem 	= new ActionItem(ID_DROP, "Drop Object", getResources().getDrawable(R.drawable.drop_obj));
+        ActionItem actSenItem 		= new ActionItem(ID_ACTSEN, "Activate Sensor", getResources().getDrawable(R.drawable.activate_sensor));
+        ActionItem deactSenItem = new ActionItem(ID_DEACTSEN,"Deactivate Sensor",getResources().getDrawable(R.drawable.deactivate_sensor));
+        
+        //use setSticky(true) to disable QuickAction dialog being dismissed after an item is clicked
+        //prevItem.setSticky(true);
+        //nextItem.setSticky(true);
+		
+		//create QuickAction. Use QuickAction.VERTICAL or QuickAction.HORIZONTAL param to define layout 
+        //orientation
+		final QuickAction quickAction = new QuickAction(this, QuickAction.VERTICAL);
+		
+		//add action items into QuickAction
+        quickAction.addActionItem(toggleLocItem);
+		quickAction.addActionItem(toggleAlwaysItem);
+        quickAction.addActionItem(toggleEventuallyItem);
+        quickAction.addActionItem(pickupItem);
+        quickAction.addActionItem(dropItem);
+        quickAction.addActionItem(actSenItem);
+        quickAction.addActionItem(deactSenItem);
+        
+        //Set listener for action item clicked
+		quickAction.setOnActionItemClickListener(new QuickAction.OnActionItemClickListener() {			
+			@Override
+			public void onItemClick(QuickAction source, int pos, int actionId) {				
+				ActionItem actionItem = quickAction.getActionItem(pos);
+                 
+				//here we can filter which action item was clicked with pos or actionId parameter
+				if (actionId == ID_LOC) {
+					if (DrawView.colorballs[DrawView.balID - 1].isValid()) {
+						DrawView.colorballs[DrawView.balID - 1].setValid(false);
+					} else {
+						DrawView.colorballs[DrawView.balID - 1].setValid(true);
+					}
+					Toast.makeText(getApplicationContext(), "toggle location", Toast.LENGTH_SHORT).show();
+				} else if (actionId == ID_ALWAYS) {
+					DrawView.colorballs[DrawView.balID - 1].toggleAlways();
+					Toast.makeText(getApplicationContext(), "toggle always", Toast.LENGTH_SHORT).show();
+				}else if (actionId == ID_EVENTUALLY) {
+					DrawView.colorballs[DrawView.balID - 1].toggleEventually();
+					Toast.makeText(getApplicationContext(), "toggle eventually", Toast.LENGTH_SHORT).show();
+				}else if (actionId == ID_PICKUP) {
+					DrawView.colorballs[DrawView.balID - 1].togglePickObject();
+					Toast.makeText(getApplicationContext(), "toggle pick object", Toast.LENGTH_SHORT).show();
+				}else if (actionId == ID_DROP) {
+					DrawView.colorballs[DrawView.balID - 1].toggleDropObject();
+					Toast.makeText(getApplicationContext(), "toggle drop object", Toast.LENGTH_SHORT).show();
+				}else if (actionId == ID_ACTSEN) {
+					DrawView.colorballs[DrawView.balID - 1].toggleActivateSensor();
+					Toast.makeText(getApplicationContext(), "toggle activate sensor", Toast.LENGTH_SHORT).show();
+				}else if (actionId == ID_DEACTSEN) {
+					DrawView.colorballs[DrawView.balID - 1].toggleDeactivateSensor();
+					Toast.makeText(getApplicationContext(), "toggle deactivate sensor", Toast.LENGTH_SHORT).show();
+				}else {
+					Toast.makeText(getApplicationContext(), actionItem.getTitle() + " selected", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+		
+		//set listnener for on dismiss event, this listener will be called only if QuickAction dialog was dismissed
+		//by clicking the area outside the dialog.
+		quickAction.setOnDismissListener(new QuickAction.OnDismissListener() {			
+			@Override
+			public void onDismiss() {
+				Toast.makeText(getApplicationContext(), "Dismissed", Toast.LENGTH_SHORT).show();
+			}
+		});
+////end of stuff related to quick action menu
+////////////////////////////////////////////////////////////////////////////////////////
+		
+		
 		wayPoint1 = (CheckBox) findViewById(R.id.wayPoint1);
 		wayPoint2 = (CheckBox) findViewById(R.id.wayPoint2);
 		wayPoint3 = (CheckBox) findViewById(R.id.wayPoint3);
@@ -109,24 +196,17 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		wayPoint8.setOnCheckedChangeListener(this);
 		wayPoint9.setOnCheckedChangeListener(this);
 		wayPoint10.setOnCheckedChangeListener(this);
-		// spinnerWaypoint = (Spinner) findViewById(R.id.spinnerWaypoint);
-		// spinnerWaypoint.setOnItemSelectedListener(new
-		// OnItemSelectedListener() {
-
-		/*
-		 * @Override public void onItemSelected(AdapterView<?> arg0, View arg1,
-		 * int arg2, long arg3) { numWaypoints =
-		 * Integer.valueOf(arg0.getItemAtPosition(arg2).toString());
-		 * 
-		 * }
-		 * 
-		 * @Override public void onNothingSelected(AdapterView<?> arg0) {
-		 * numWaypoints = 0;
-		 * 
-		 * } });
-		 */
+		
 		dv = (DrawView) findViewById(R.id.draw_view);
 		registerForContextMenu(dv);
+		dv.setObserver(new QactionObserver() {
+			
+			@Override
+			public void callback() {
+				quickAction.show(new View(getApplicationContext()));// TODO Auto-generated method stub
+				
+			}
+		});
 
 		Button buttonLoadImage = (Button) findViewById(R.id.selectMap);
 		buttonLoadImage.setOnClickListener(new View.OnClickListener() {

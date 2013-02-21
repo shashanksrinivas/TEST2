@@ -34,6 +34,8 @@ public class DrawView extends View {
 	SimpleOnGestureListener listener = new SimpleOnGestureListener();
 	Path mPath = new Path();
 	String string = "";
+	
+	private QactionObserver mQactionObserver;
 
 	public DrawView(Context context, AttributeSet attributeset) {
 		super(context, attributeset);
@@ -236,7 +238,9 @@ public class DrawView extends View {
 				// then it must be on the ball
 				if (radCircle < 23) {
 					balID = colorballs[i].getID();
-					showContextMenu();
+					//showContextMenu();
+					callQactionShow();
+					MainActivity.finalLtlString = computeLtl();
 					break;
 				}
 
@@ -341,29 +345,46 @@ public class DrawView extends View {
 	}
 
 	public String computeLtl() {
-		LinkedList<String> orStrings = new LinkedList<String>();
-		LinkedList<String> andStrings = new LinkedList<String>();
+		//LinkedList<String> orStrings = new LinkedList<String>();
+		//LinkedList<String> andStrings = new LinkedList<String>();
+		boolean visited[] = new boolean[10];//keeps track of visted nodes
 		string = "";
 		for (int i = 0; i < 10; i++) {
-			if (MainActivity.waypoint[i] && isRoot(colorballs[i].getID())) {
+			String tmpString = "";
+			if (MainActivity.waypoint[i] && isRoot(colorballs[i].getID()) && !visited[i]) {
+				tmpString = theGraph.dfs(colorballs[i].getID());
 				/*
 				 * if (string == "") { string = string +
 				 * theGraph.dfs(colorballs[i].getID()); } else {
 				 */
-				boolean or = false;
+				//boolean or = false;
 				for (int j = 0; j < 10; j++) {
-					if (colorballs[i].isLineTo(j + 1))
-						or = true;
+					if (colorballs[i].isLineTo(j + 1) && !visited[j] ){
+						//or = true;
+						visited[i]=true;
+						visited[j]=true;
+						if(tmpString.equals("")){
+							tmpString = theGraph.dfs(colorballs[j].getID());
+						}
+						else{
+						tmpString = tmpString + " || " + theGraph.dfs(colorballs[j].getID());
+						}
+					}
+				}
+				if(string==""){
+					string = "(" + tmpString + ")";
+				}else{
+					string = string + " && (" + tmpString+ ")";
 				}
 
-				if (or) {
+				/*if (or) {
 					orStrings.add(theGraph.dfs(colorballs[i].getID()));
 				} else {
 					andStrings.add(theGraph.dfs(colorballs[i].getID()));
-				}
+				}*/
 			}
 		}
-		for (String s : andStrings) {
+		/*for (String s : andStrings) {
 			if (string == "") {
 				string = s;
 			} else {
@@ -372,8 +393,8 @@ public class DrawView extends View {
 				}
 			}
 
-		}
-		if (!string.isEmpty())
+		}*/
+	/*	if (!string.isEmpty())
 			string = "(" + string + ")";
 		String stringtemp = string;
 		string = "";
@@ -393,7 +414,7 @@ public class DrawView extends View {
 			string = stringtemp + " && " + string;
 		}else if(string.isEmpty()){
 			string = stringtemp;
-		}
+		}*/
 
 		return string;
 	}
@@ -416,4 +437,16 @@ public class DrawView extends View {
 		public int getheight(){
 			return height;
 		}
+		
+		 // this is to set the observer
+	    public void setObserver(QactionObserver observer){
+	        mQactionObserver = observer;
+	    }
+
+	    // here be the magic
+	    private void callQactionShow(){
+	        if( mQactionObserver != null ){
+	            mQactionObserver.callback();
+	        }
+	    }
 }
