@@ -345,8 +345,8 @@ public class QuickAction extends PopupWindows implements OnDismissListener {
         final View hideArrow = (whichArrow == R.id.arrow_up) ? mArrowDown : mArrowUp;
 
         final int arrowWidth = mArrowUp.getMeasuredWidth();
-
-        showArrow.setVisibility(View.VISIBLE);
+//arrow made invisible for the purpose of this app
+        showArrow.setVisibility(View.INVISIBLE);
         
         ViewGroup.MarginLayoutParams param = (ViewGroup.MarginLayoutParams)showArrow.getLayoutParams();
        

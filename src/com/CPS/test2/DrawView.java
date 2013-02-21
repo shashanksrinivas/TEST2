@@ -3,6 +3,8 @@ package com.CPS.test2;
 import java.util.LinkedList;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -28,6 +30,8 @@ public class DrawView extends View {
 	private int orGoToState = 0;
 	private int width;
 	private int height;
+	Bitmap andBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.and_ball);
+	Bitmap orBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.or_ball);
 	// private boolean secondDoubleTapOccurred = false;
 	Paint paint = new Paint();
 	GestureDetector gestureDetector;
@@ -89,6 +93,14 @@ public class DrawView extends View {
 							colorballs[i].getY() + 25,
 							colorballs[j].getX() + 25,
 							colorballs[j].getY() + 25, paint);
+					canvas.drawBitmap(orBitmap, (colorballs[i].getX() + colorballs[j].getX())/2, (colorballs[i].getY() + colorballs[j].getY())/2, paint);
+				}else if(!colorballs[i].isLineTo(j + 1) && MainActivity.waypoint[i]&& MainActivity.waypoint[j] && isRoot(i+1) && isRoot(j+1)){
+					paint.setColor(Color.MAGENTA);
+					canvas.drawLine(colorballs[i].getX() + 25,
+							colorballs[i].getY() + 25,
+							colorballs[j].getX() + 25,
+							colorballs[j].getY() + 25, paint);
+					canvas.drawBitmap(andBitmap, (colorballs[i].getX() + colorballs[j].getX())/2, (colorballs[i].getY() + colorballs[j].getY())/2, paint);
 				}
 			}
 		}
@@ -158,7 +170,7 @@ public class DrawView extends View {
 			}
 		}
 
-		canvas.drawText("from:" + fromBalID + ",to:" + toBalID, 500, 500, paint);
+		//canvas.drawText("from:" + fromBalID + ",to:" + toBalID, 500, 500, paint);
 
 		// canvas.drawLine(colorballs[0].getX()+25, colorballs[0].getY()+25,
 		// colorballs[1].getX()+25, colorballs[1].getY()+25, paint);
@@ -277,7 +289,7 @@ public class DrawView extends View {
 
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e) {
-			if (balID > 0) {
+			if (balID > 0 && isRoot(colorballs[balID -1].getID())) {
 				/*
 				 * DrawView.fromBalIDSingleTap = balID; if (colorballs[balID -
 				 * 1].isValid()) { colorballs[balID - 1].setValid(false); } else

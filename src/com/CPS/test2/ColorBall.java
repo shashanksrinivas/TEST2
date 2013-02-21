@@ -243,6 +243,8 @@ public class ColorBall {
 		return true;
 	}
 
+	
+
 	public void moveBall(int goX, int goY) {
 		// check the borders, and set the direction if a border has reached
 		if (coordX > 270) {

@@ -1,6 +1,7 @@
 package com.CPS.test2;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,6 +47,9 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	Bitmap bmp;
 	static Bitmap scaledBitmap;
 	static Bitmap alteredBitmap;
+	
+	
+	
 	Canvas canvas;
 	Paint paint;
 	static Matrix matrix;
@@ -55,13 +60,13 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	String hyperFinalString;
 	
 	//action id
-		private static final int ID_LOC     = 1;
-		private static final int ID_ALWAYS   = 2;
+		private static final int ID_LOC = 1;
+		private static final int ID_ALWAYS = 2;
 		private static final int ID_EVENTUALLY = 3;
-		private static final int ID_PICKUP   = 4;
-		private static final int ID_DROP  = 5;	
-		private static final int ID_ACTSEN     = 6;
-		private static final int ID_DEACTSEN     = 7;
+		private static final int ID_PICKUP = 4;
+		private static final int ID_DROP = 5;	
+		private static final int ID_ACTSEN = 6;
+		private static final int ID_DEACTSEN = 7;
 
 	CheckBox wayPoint1;
 	CheckBox wayPoint2;
@@ -203,7 +208,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 			
 			@Override
 			public void callback() {
-				quickAction.show(new View(getApplicationContext()));// TODO Auto-generated method stub
+				quickAction.show((Button) findViewById(R.id.selectMap));// TODO Auto-generated method stub
 				
 			}
 		});
@@ -274,6 +279,10 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		});
 
 	}
+	
+	
+	 
+	
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
