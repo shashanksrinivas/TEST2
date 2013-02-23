@@ -319,7 +319,7 @@ firstImplication=true;
 		String notString="";
 		for(int i = 0;i<10;i++){
 			int tempBalID = i+1;
-			if( i!=(toBalID-1) && i!=(fromBalID-1) && MainActivity.waypoint[i]){
+			if( i!=(toBalID-1) /*&& i!=(fromBalID-1)*/ && MainActivity.waypoint[i]){
 				if(notString==""){
 					
 					notString ="" +  tempBalID;

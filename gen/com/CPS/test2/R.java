@@ -57,11 +57,12 @@ public final class R {
         public static final int menu_search=0x7f020016;
         public static final int menu_up_arrow=0x7f020017;
         public static final int or_ball=0x7f020018;
-        public static final int pickup_obj=0x7f020019;
-        public static final int popup=0x7f02001a;
-        public static final int toggle_always=0x7f02001b;
-        public static final int toggle_eventually=0x7f02001c;
-        public static final int toggle_loc=0x7f02001d;
+        public static final int or_mode=0x7f020019;
+        public static final int pickup_obj=0x7f02001a;
+        public static final int popup=0x7f02001b;
+        public static final int toggle_always=0x7f02001c;
+        public static final int toggle_eventually=0x7f02001d;
+        public static final int toggle_loc=0x7f02001e;
     }
     public static final class id {
         public static final int addMission=0x7f090003;

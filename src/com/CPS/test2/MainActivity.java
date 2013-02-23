@@ -108,14 +108,14 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		setContentView(R.layout.activity_main);
 /////////////////////////////////////////////////////////////////////////////////////////
 ////stuff related to quick action menu
-		ActionItem toggleLocItem 	= new ActionItem(ID_LOC, "VISIT/AVOID", getResources().getDrawable(R.drawable.toggle_loc));
-		ActionItem toggleAlwaysItem 	= new ActionItem(ID_ALWAYS, "ONCE/ALWAYS", getResources().getDrawable(R.drawable.toggle_always));
-        ActionItem toggleEventuallyItem 	= new ActionItem(ID_EVENTUALLY, "NEXT/LATER", getResources().getDrawable(R.drawable.toggle_eventually));
-        ActionItem toggleORModeItem = new ActionItem(ID_ORMODE, "OR NEXT(AND)/\nAND NEXT(LATER)", getResources().getDrawable(R.drawable.toggle_always));
-        ActionItem pickupItem 	= new ActionItem(ID_PICKUP, "Pickup Object", getResources().getDrawable(R.drawable.pickup_obj));
-        ActionItem dropItem 	= new ActionItem(ID_DROP, "Drop Object", getResources().getDrawable(R.drawable.drop_obj));
-        ActionItem actSenItem 		= new ActionItem(ID_ACTSEN, "Activate Sensor", getResources().getDrawable(R.drawable.activate_sensor));
-        ActionItem deactSenItem = new ActionItem(ID_DEACTSEN,"Deactivate Sensor",getResources().getDrawable(R.drawable.deactivate_sensor));
+		ActionItem toggleLocItem 	= new ActionItem(ID_LOC, "VISIT / AVOID", getResources().getDrawable(R.drawable.toggle_loc));
+		ActionItem toggleAlwaysItem 	= new ActionItem(ID_ALWAYS, "ONCE / ALWAYS", getResources().getDrawable(R.drawable.toggle_always));
+        ActionItem toggleEventuallyItem 	= new ActionItem(ID_EVENTUALLY, "NEXT / LATER", getResources().getDrawable(R.drawable.toggle_eventually));
+        ActionItem toggleORModeItem = new ActionItem(ID_ORMODE, "OR NEXT(AND)/\nAND NEXT(LATER)", getResources().getDrawable(R.drawable.or_mode));
+        ActionItem pickupItem 	= new ActionItem(ID_PICKUP, "PICKUP OBJECT (TRUE/FALSE)", getResources().getDrawable(R.drawable.pickup_obj));
+        ActionItem dropItem 	= new ActionItem(ID_DROP, "DROP OBJECT (TRUE/FALSE)", getResources().getDrawable(R.drawable.drop_obj));
+        ActionItem actSenItem 		= new ActionItem(ID_ACTSEN, "ACTIVATE SENSOR (TRUE/FALSE)", getResources().getDrawable(R.drawable.activate_sensor));
+        ActionItem deactSenItem = new ActionItem(ID_DEACTSEN,"DEACTIVATE SENSOR (TRUE/FALSE)",getResources().getDrawable(R.drawable.deactivate_sensor));
         
         //use setSticky(true) to disable QuickAction dialog being dismissed after an item is clicked
         //prevItem.setSticky(true);
@@ -135,10 +135,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
         quickAction.addActionItem(actSenItem);
         quickAction.addActionItem(deactSenItem);
         
-        quickAction.addActionItem(deactSenItem);
-        quickAction.addActionItem(deactSenItem);
-        quickAction.addActionItem(deactSenItem);
-        
+                
         //Set listener for action item clicked
 		quickAction.setOnActionItemClickListener(new QuickAction.OnActionItemClickListener() {			
 			@Override
@@ -149,31 +146,62 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 				if (actionId == ID_LOC) {
 					if (DrawView.colorballs[DrawView.balID - 1].isValid()) {
 						DrawView.colorballs[DrawView.balID - 1].setValid(false);
+						Toast.makeText(getApplicationContext(), "AVOID SELECTED", Toast.LENGTH_SHORT).show();
 					} else {
 						DrawView.colorballs[DrawView.balID - 1].setValid(true);
+						Toast.makeText(getApplicationContext(), "VISIT SELECTED", Toast.LENGTH_SHORT).show();
 					}
-					Toast.makeText(getApplicationContext(), "visit/avoid", Toast.LENGTH_SHORT).show();
+					
 				} else if (actionId == ID_ALWAYS) {
 					DrawView.colorballs[DrawView.balID - 1].toggleAlways();
-					Toast.makeText(getApplicationContext(), "once/always", Toast.LENGTH_SHORT).show();
+					if(DrawView.colorballs[DrawView.balID - 1].isAlways()){
+						Toast.makeText(getApplicationContext(), "ALWAYS SELECTED", Toast.LENGTH_SHORT).show();
+					}else{
+					Toast.makeText(getApplicationContext(), "ONCE SELECTED", Toast.LENGTH_SHORT).show();
+					}
 				}else if (actionId == ID_EVENTUALLY) {
 					DrawView.colorballs[DrawView.balID - 1].toggleEventually();
-					Toast.makeText(getApplicationContext(), "next/later", Toast.LENGTH_SHORT).show();
+					if(DrawView.colorballs[DrawView.balID - 1].isEventually()){
+					Toast.makeText(getApplicationContext(), "LATER SELECTED", Toast.LENGTH_SHORT).show();
+					}else{
+						Toast.makeText(getApplicationContext(), "NEXT SELECTED", Toast.LENGTH_SHORT).show();
+					}
 				}else if(actionId == ID_ORMODE){
 					DrawView.colorballs[DrawView.balID - 1].toggleORMode();
+					if(DrawView.colorballs[DrawView.balID - 1].isORMode()){
+						Toast.makeText(getApplicationContext(), "IN OR MODE", Toast.LENGTH_SHORT).show();
+					}else{
+						Toast.makeText(getApplicationContext(), "IN AND MODE", Toast.LENGTH_SHORT).show();
+					}
 				}else if (actionId == ID_PICKUP) {
 				
 					DrawView.colorballs[DrawView.balID - 1].togglePickObject();
-					Toast.makeText(getApplicationContext(), "toggle pick object", Toast.LENGTH_SHORT).show();
+					if(DrawView.colorballs[DrawView.balID - 1].isPickObject()){
+					Toast.makeText(getApplicationContext(), "PICK OBJECT TRUE", Toast.LENGTH_SHORT).show();
+					}else{
+						Toast.makeText(getApplicationContext(), "PICK OBJECT FALSE", Toast.LENGTH_SHORT).show();
+					}
 				}else if (actionId == ID_DROP) {
 					DrawView.colorballs[DrawView.balID - 1].toggleDropObject();
-					Toast.makeText(getApplicationContext(), "toggle drop object", Toast.LENGTH_SHORT).show();
+					if(DrawView.colorballs[DrawView.balID - 1].isDropObject()){
+					Toast.makeText(getApplicationContext(), "DROP OBJECT TRUE", Toast.LENGTH_SHORT).show();
+					}else{
+						Toast.makeText(getApplicationContext(), "DROP OBJECT FALSE", Toast.LENGTH_SHORT).show();
+					}
 				}else if (actionId == ID_ACTSEN) {
 					DrawView.colorballs[DrawView.balID - 1].toggleActivateSensor();
-					Toast.makeText(getApplicationContext(), "toggle activate sensor", Toast.LENGTH_SHORT).show();
+					if(DrawView.colorballs[DrawView.balID - 1].isActivateSensor()){
+					Toast.makeText(getApplicationContext(), "ACTIVATE SENSOR TRUE", Toast.LENGTH_SHORT).show();
+					}else{
+						Toast.makeText(getApplicationContext(), "ACTIVATE SENSOR FALSE", Toast.LENGTH_SHORT).show();
+					}
 				}else if (actionId == ID_DEACTSEN) {
 					DrawView.colorballs[DrawView.balID - 1].toggleDeactivateSensor();
-					Toast.makeText(getApplicationContext(), "toggle deactivate sensor", Toast.LENGTH_SHORT).show();
+					if(DrawView.colorballs[DrawView.balID - 1].isDeactivateSensor()){
+					Toast.makeText(getApplicationContext(), "DEACTIVATE SENSOR TRUE", Toast.LENGTH_SHORT).show();
+					}else{
+						Toast.makeText(getApplicationContext(), "DEACTIVATE SENSOR FALSE", Toast.LENGTH_SHORT).show();
+					}
 				}else {
 					Toast.makeText(getApplicationContext(), actionItem.getTitle() + " selected", Toast.LENGTH_SHORT).show();
 				}
