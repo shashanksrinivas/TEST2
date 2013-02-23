@@ -19,6 +19,7 @@ public class ColorBall {
 	private boolean lineTo[] = new boolean[10];
 	private boolean valid = true;//whether you can or can't visit a location
 	private boolean always = false;//for visiting infinitely often
+	private boolean orMode = true;
 	private boolean eventually = true;
 	private boolean pickObject = false;
 	private boolean dropObject = false;
@@ -156,6 +157,14 @@ public class ColorBall {
 	
 	public void toggleEventually(){
 		eventually = !eventually;
+	}
+	
+	public void toggleORMode(){
+		orMode = !orMode;
+	}
+	
+	public boolean isORMode(){
+		return orMode;
 	}
 	
 	public void setClickState(int value){

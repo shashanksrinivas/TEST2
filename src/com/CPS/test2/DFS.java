@@ -154,9 +154,11 @@ class Graph {
 			}
 		}
 		theStack.push(balID); // push it
+		int mostRecentPop=-1;
 
 		while (!theStack.isEmpty()) // until stack empty,
 		{
+			
 			// get an unvisited vertex adjacent to stack top
 			int v = getAdjUnvisitedVertex(theStack.peek());
 			if (v == -1) {// if no such vertex,
@@ -167,7 +169,10 @@ class Graph {
 				// mainString = ltlString;
 				// vertexList[theStack.peek()].wasVisited = true;
 				popFlag = true;
-				theStack.pop();
+				mostRecentPop = theStack.pop();
+				String[] splitStrings = ltlString.split("\\.");
+				ltlString = splitStrings[0] + ")." + splitStrings[1].replaceFirst("\\)", "");
+				
 			} else // if it exists,
 			{
 				vertexList[v].wasVisited = true; // mark it
@@ -221,17 +226,20 @@ class Graph {
 					if(!DrawView.colorballs[v-1].isEventually()){
 						if(firstImplication){
 							if(DrawView.colorballs[theStack.peek()-1].isValid()){
-						tempString = "=>X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
+						tempString = "(X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".))";
 							}else{
 								tempString = "X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
 							}
-						firstImplication=false;
+						//firstImplication=false;
 						}else{
-							tempString = "&& X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
+							tempString = "X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
 						}
 					}else{
-
-					tempString = "F(" + tempString + ".)";
+						if(DrawView.colorballs[theStack.peek()-1].isValid()){
+					tempString = "((F(" + tempString + ".)))";
+						}else{
+							tempString = "((" + tempString + ".))";//check
+						}
 					}
 				}
 				if (!popFlag) {
@@ -240,8 +248,14 @@ class Graph {
 					if (DrawView.colorballs[theStack.peek() - 1].isValid()) {
 						if(DrawView.colorballs[v-1].isValid()){
 							if(!DrawView.colorballs[v-1].isEventually()){
-								ltlString = splitStrings[0] + tempString
+								if(firstImplication){
+								ltlString = splitStrings[0] + " => " + tempString
 									+ splitStrings[1];
+								}else{
+									ltlString = splitStrings[0] + " && " + tempString
+											+ splitStrings[1];
+									firstImplication=false;
+								}
 							}else{
 								ltlString = splitStrings[0] + " && " + tempString
 										+ splitStrings[1];
@@ -267,12 +281,23 @@ class Graph {
 						
 					}
 				} else {
+					if(!DrawView.colorballs[theStack.peek()-1].isORMode()){
 					ltlString = splitStrings[0] + ") && (" + tempString
 							+ splitStrings[1];
+					}else{
+						if(mostRecentPop>0 && !DrawView.colorballs[mostRecentPop-1].isEventually()){
+							ltlString = splitStrings[0] + " || " + tempString 
+									+ splitStrings[1];
+						}else{
+							ltlString = splitStrings[0] + ") || (" + tempString 
+								+ splitStrings[1];
+						}
+					}
 					popFlag = false;
 				}
 
 				theStack.push(v); // push it
+				mostRecentPop=-1;
 			}
 		} // end while
 firstImplication=true;
@@ -304,7 +329,7 @@ firstImplication=true;
 			}
 		}
 		if(notString.equals(""))
-			return "true";
+			return "False";
 		return notString;
 	}
 

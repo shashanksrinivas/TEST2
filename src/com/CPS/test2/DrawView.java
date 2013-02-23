@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
@@ -16,6 +17,7 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 public class DrawView extends View {
 	static ColorBall[] colorballs = new ColorBall[10]; // array that holds the
@@ -32,6 +34,8 @@ public class DrawView extends View {
 	private int height;
 	Bitmap andBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.and_ball);
 	Bitmap orBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.or_ball);
+	Bitmap nextBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ball_next);
+	Bitmap eventuallyBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ball_future);
 	// private boolean secondDoubleTapOccurred = false;
 	Paint paint = new Paint();
 	GestureDetector gestureDetector;
@@ -87,13 +91,14 @@ public class DrawView extends View {
 
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				if (colorballs[i].isLineTo(j + 1) && MainActivity.waypoint[i]) {
+				if (colorballs[i].isLineTo(j + 1) && MainActivity.waypoint[i]) {//bitmap for OR
 					paint.setColor(Color.CYAN);
 					canvas.drawLine(colorballs[i].getX() + 25,
 							colorballs[i].getY() + 25,
 							colorballs[j].getX() + 25,
 							colorballs[j].getY() + 25, paint);
 					canvas.drawBitmap(orBitmap, (colorballs[i].getX() + colorballs[j].getX())/2, (colorballs[i].getY() + colorballs[j].getY())/2, paint);
+					//bitmap for AND
 				}else if(!colorballs[i].isLineTo(j + 1) && MainActivity.waypoint[i]&& MainActivity.waypoint[j] && isRoot(i+1) && isRoot(j+1)){
 					paint.setColor(Color.MAGENTA);
 					canvas.drawLine(colorballs[i].getX() + 25,
@@ -109,10 +114,23 @@ public class DrawView extends View {
 			for (int j = 0; j < 10; j++) {
 				if (colorballs[i].isArrowTo(j + 1) && MainActivity.waypoint[i]) {
 					paint.setColor(Color.BLUE);
+					if(colorballs[i].isORMode()){
+						paint.setColor(Color.GRAY);
+					paint.setPathEffect(new DashPathEffect(new float[] {10,20}, 0));//TODO:allocate elsewhere later
+					}else{
+						paint.setColor(Color.GRAY);
+						paint.setPathEffect(null);
+					}
 					canvas.drawLine(colorballs[i].getX() + 25,
 							colorballs[i].getY() + 25,
 							colorballs[j].getX() + 25,
 							colorballs[j].getY() + 25, paint);
+					paint.setPathEffect(null);
+					if(colorballs[j].isEventually()){
+						canvas.drawBitmap(eventuallyBitmap, (colorballs[i].getX() + colorballs[j].getX())/2, (colorballs[i].getY() + colorballs[j].getY())/2, paint);
+					}else{
+						canvas.drawBitmap(nextBitmap, (colorballs[i].getX() + colorballs[j].getX())/2, (colorballs[i].getY() + colorballs[j].getY())/2, paint);
+					}
 
 					float deltaX = colorballs[j].getX() - colorballs[i].getX();
 					float deltaY = colorballs[j].getY() - colorballs[i].getY();
@@ -175,6 +193,9 @@ public class DrawView extends View {
 		// canvas.drawLine(colorballs[0].getX()+25, colorballs[0].getY()+25,
 		// colorballs[1].getX()+25, colorballs[1].getY()+25, paint);
 		invalidate();
+		MainActivity.finalLtlString = computeLtl();
+		MainActivity.mCurrentLtlOutput.setTextScaleX(2);
+		MainActivity.mCurrentLtlOutput.setText("LTL: " + MainActivity.finalLtlString);
 
 	}
 

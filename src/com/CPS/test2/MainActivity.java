@@ -63,10 +63,11 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		private static final int ID_LOC = 1;
 		private static final int ID_ALWAYS = 2;
 		private static final int ID_EVENTUALLY = 3;
-		private static final int ID_PICKUP = 4;
-		private static final int ID_DROP = 5;	
-		private static final int ID_ACTSEN = 6;
-		private static final int ID_DEACTSEN = 7;
+		private static final int ID_ORMODE = 4;
+		private static final int ID_PICKUP = 5;
+		private static final int ID_DROP = 6;	
+		private static final int ID_ACTSEN = 7;
+		private static final int ID_DEACTSEN = 8;
 
 	CheckBox wayPoint1;
 	CheckBox wayPoint2;
@@ -89,6 +90,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	private static final int REQUEST_LINK_TO_DBX = 0;
 
 	private TextView mTestOutput;
+	static TextView mCurrentLtlOutput;
 	private Button mLinkButton;
 	private Button mUploadStringButton;
 	private Button mDelMissionButton;
@@ -106,9 +108,10 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		setContentView(R.layout.activity_main);
 /////////////////////////////////////////////////////////////////////////////////////////
 ////stuff related to quick action menu
-		ActionItem toggleLocItem 	= new ActionItem(ID_LOC, "Toggle Location\n\n", getResources().getDrawable(R.drawable.toggle_loc));
-		ActionItem toggleAlwaysItem 	= new ActionItem(ID_ALWAYS, "Toggle Always", getResources().getDrawable(R.drawable.toggle_always));
-        ActionItem toggleEventuallyItem 	= new ActionItem(ID_EVENTUALLY, "Toggle Eventually", getResources().getDrawable(R.drawable.toggle_eventually));
+		ActionItem toggleLocItem 	= new ActionItem(ID_LOC, "VISIT/AVOID", getResources().getDrawable(R.drawable.toggle_loc));
+		ActionItem toggleAlwaysItem 	= new ActionItem(ID_ALWAYS, "ONCE/ALWAYS", getResources().getDrawable(R.drawable.toggle_always));
+        ActionItem toggleEventuallyItem 	= new ActionItem(ID_EVENTUALLY, "NEXT/LATER", getResources().getDrawable(R.drawable.toggle_eventually));
+        ActionItem toggleORModeItem = new ActionItem(ID_ORMODE, "OR NEXT(AND)/\nAND NEXT(LATER)", getResources().getDrawable(R.drawable.toggle_always));
         ActionItem pickupItem 	= new ActionItem(ID_PICKUP, "Pickup Object", getResources().getDrawable(R.drawable.pickup_obj));
         ActionItem dropItem 	= new ActionItem(ID_DROP, "Drop Object", getResources().getDrawable(R.drawable.drop_obj));
         ActionItem actSenItem 		= new ActionItem(ID_ACTSEN, "Activate Sensor", getResources().getDrawable(R.drawable.activate_sensor));
@@ -126,9 +129,14 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
         quickAction.addActionItem(toggleLocItem);
 		quickAction.addActionItem(toggleAlwaysItem);
         quickAction.addActionItem(toggleEventuallyItem);
+        quickAction.addActionItem(toggleORModeItem);
         quickAction.addActionItem(pickupItem);
         quickAction.addActionItem(dropItem);
         quickAction.addActionItem(actSenItem);
+        quickAction.addActionItem(deactSenItem);
+        
+        quickAction.addActionItem(deactSenItem);
+        quickAction.addActionItem(deactSenItem);
         quickAction.addActionItem(deactSenItem);
         
         //Set listener for action item clicked
@@ -144,14 +152,17 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 					} else {
 						DrawView.colorballs[DrawView.balID - 1].setValid(true);
 					}
-					Toast.makeText(getApplicationContext(), "toggle location", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(), "visit/avoid", Toast.LENGTH_SHORT).show();
 				} else if (actionId == ID_ALWAYS) {
 					DrawView.colorballs[DrawView.balID - 1].toggleAlways();
-					Toast.makeText(getApplicationContext(), "toggle always", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(), "once/always", Toast.LENGTH_SHORT).show();
 				}else if (actionId == ID_EVENTUALLY) {
 					DrawView.colorballs[DrawView.balID - 1].toggleEventually();
-					Toast.makeText(getApplicationContext(), "toggle eventually", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(), "next/later", Toast.LENGTH_SHORT).show();
+				}else if(actionId == ID_ORMODE){
+					DrawView.colorballs[DrawView.balID - 1].toggleORMode();
 				}else if (actionId == ID_PICKUP) {
+				
 					DrawView.colorballs[DrawView.balID - 1].togglePickObject();
 					Toast.makeText(getApplicationContext(), "toggle pick object", Toast.LENGTH_SHORT).show();
 				}else if (actionId == ID_DROP) {
@@ -227,6 +238,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		});
 
 		mTestOutput = (TextView) findViewById(R.id.ltlTextView);
+		mCurrentLtlOutput = (TextView) findViewById(R.id.currentLtlTextView);
 		mLinkButton = (Button) findViewById(R.id.transferLTL);
 		mLinkButton.setOnClickListener(new OnClickListener() {
 			@Override
