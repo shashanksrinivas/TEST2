@@ -213,7 +213,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		quickAction.setOnDismissListener(new QuickAction.OnDismissListener() {			
 			@Override
 			public void onDismiss() {
-				Toast.makeText(getApplicationContext(), "Dismissed", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "NO OPTION SELECTED", Toast.LENGTH_LONG).show();
 			}
 		});
 ////end of stuff related to quick action menu
