@@ -33,6 +33,8 @@ public class DrawView extends View {
 	private int orGoToState = 0;
 	private int width;
 	private int height;
+	private int mWindowHeight = this.getHeight();
+	private int mWindowWidth = this.getWidth();
 	Bitmap andBitmap = BitmapFactory.decodeResource(getResources(),
 			R.drawable.and_ball);
 	Bitmap orBitmap = BitmapFactory.decodeResource(getResources(),
@@ -54,7 +56,8 @@ public class DrawView extends View {
 		super(context, attributeset);
 		setFocusable(true); // necessary for getting the touch events
 		gestureDetector = new GestureDetector(new LearnGestureListener());
-
+		mWindowHeight = this.getHeight();
+		mWindowWidth = this.getWidth();
 		Point point = new Point();
 		point.x = 0;
 		point.y = 20;
@@ -96,7 +99,7 @@ public class DrawView extends View {
 
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				if (colorballs[i].isLineTo(j + 1) && MainActivity.waypoint[i]) {// bitmap
+				if (colorballs[i].isLineTo(j + 1) && MainActivity.waypoint[i] && MainActivity.waypoint[j]) {// bitmap
 																				// for
 																				// OR
 					paint.setColor(Color.CYAN);
@@ -111,7 +114,7 @@ public class DrawView extends View {
 					// bitmap for AND
 				} else if (!colorballs[i].isLineTo(j + 1)
 						&& MainActivity.waypoint[i] && MainActivity.waypoint[j]
-						&& isRoot(i + 1) && isRoot(j + 1)) {
+						&& isRoot(i + 1) && isRoot(j + 1) &&!isLineToNonRootNode(j+1) &&!isLineToNonRootNode(i+1)) {
 					paint.setColor(Color.MAGENTA);
 					canvas.drawLine(colorballs[i].getX() + 25,
 							colorballs[i].getY() + 25,
@@ -225,6 +228,14 @@ public class DrawView extends View {
 
 	}
 
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		// TODO Auto-generated method stub
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		mWindowHeight = heightMeasureSpec;
+		mWindowWidth = widthMeasureSpec;
+	}
+
 	// events when touching the screen
 	public boolean onTouchEvent(MotionEvent event) {
 		return gestureDetector.onTouchEvent(event);
@@ -321,8 +332,11 @@ public class DrawView extends View {
 			int Y = (int) e2.getY();
 			// move the balls the same as the finger
 			if (balID > 0) {
+				int h = mWindowHeight;
+				if(X > 20 && X < mWindowWidth && Y > 20 && Y < 600){
 				colorballs[balID - 1].setX(X + (int) distanceX - 25);
 				colorballs[balID - 1].setY(Y + (int) distanceY - 25);
+				}
 			}
 			invalidate();
 			return true;
@@ -358,7 +372,7 @@ public class DrawView extends View {
 
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e) {
-			if (balID > 0 && isRoot(colorballs[balID - 1].getID())) {
+			if (balID > 0 /*&& isRoot(colorballs[balID - 1].getID())*/) {
 				/*
 				 * DrawView.fromBalIDSingleTap = balID; if (colorballs[balID -
 				 * 1].isValid()) { colorballs[balID - 1].setValid(false); } else
@@ -370,11 +384,13 @@ public class DrawView extends View {
 				} else if (orGoToState == 1) {
 					toBalIDSingleTap = balID;
 					orGoToState = 0;
-					colorballs[fromBalIDSingleTap - 1]
-							.toggleLineTo(toBalIDSingleTap);
-					colorballs[toBalIDSingleTap - 1]
-							.toggleLineTo(fromBalIDSingleTap);
-					// theGraph.toggleEdge(fromBalID, toBalID);
+					if (fromBalIDSingleTap != toBalIDSingleTap) {
+						colorballs[fromBalIDSingleTap - 1]
+								.toggleLineTo(toBalIDSingleTap);
+						colorballs[toBalIDSingleTap - 1]
+								.toggleLineTo(fromBalIDSingleTap);
+						// theGraph.toggleEdge(fromBalID, toBalID);
+					}
 
 				}
 
@@ -393,9 +409,11 @@ public class DrawView extends View {
 				} else if (DoubleTapOccurredState == 1) {
 					toBalID = balID;
 					DoubleTapOccurredState = 0;
-					colorballs[fromBalID - 1].toggleArrowTo(toBalID);
-
-					theGraph.toggleEdge(fromBalID, toBalID);
+					
+					if (fromBalID != toBalID) {
+						colorballs[fromBalID - 1].toggleArrowTo(toBalID);
+						theGraph.toggleEdge(fromBalID, toBalID);
+					}
 
 				}
 
@@ -433,7 +451,7 @@ public class DrawView extends View {
 		for (int i = 0; i < 10; i++) {
 			String tmpString = "";
 			if (MainActivity.waypoint[i] && isRoot(colorballs[i].getID())
-					&& !visited[i]) {
+					&& !visited[i] && !isLineToNonRootNode(colorballs[i].getID())) {
 				tmpString = theGraph.dfs(colorballs[i].getID());
 				/*
 				 * if (string == "") { string = string +
@@ -441,7 +459,7 @@ public class DrawView extends View {
 				 */
 				// boolean or = false;
 				for (int j = 0; j < 10; j++) {
-					if (colorballs[i].isLineTo(j + 1) && !visited[j]) {
+					if (colorballs[i].isLineTo(j + 1) && !visited[j] ) {
 						// or = true;
 						visited[i] = true;
 						visited[j] = true;
@@ -486,13 +504,21 @@ public class DrawView extends View {
 		return string;
 	}
 
-	public boolean isRoot(int index) {
+	public boolean isRoot(int balID) {
 		for (int i = 0; i < 10; i++) {
-			if (colorballs[i].isArrowTo(index))
+			if (colorballs[i].isArrowTo(balID))
 				return false;
 
 		}
 		return true;
+	}
+	public boolean isLineToNonRootNode(int balID){
+		for (int i = 0; i < 10; i++) {
+			if (DrawView.colorballs[balID-1].isLineTo(i+1) && !isRoot(i+1)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

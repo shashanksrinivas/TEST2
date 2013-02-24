@@ -108,11 +108,10 @@ class Graph {
 	public String dfs(int balID) // depth-first search
 	{ // begin at vertex 0
 		vertexList[balID].wasVisited = true; // mark it
-		boolean firstImplication=true;
+		boolean firstImplication = true;
 		String ltlString = "";
-		//String mainString = "";
+		// String mainString = "";
 		boolean popFlag = false;
-		
 
 		if (DrawView.colorballs[balID - 1].isPickObject()) {
 			ltlString = !ltlString.isEmpty() ? ltlString + " && F( PickObj )"
@@ -144,21 +143,23 @@ class Graph {
 			ltlString = "G (NOT(" + ltlString + ".))";
 		} else {
 			if (!DrawView.colorballs[balID - 1].isAlways()) {
-				if(DrawView.colorballs[balID - 1].isEventually()){
-				ltlString = "F(" + ltlString + ".)";
-				}else{
-					ltlString = "NOT("+ generateNotString(balID, balID) + ")U(" + ltlString + ".)";
+				if (DrawView.colorballs[balID - 1].isEventually()) {
+					ltlString = "F(" + ltlString + ".)";
+				} else {
+					ltlString = "NOT(" + generateNotString(balID, balID)
+							+ ")U(" + ltlString + ".)";
 				}
 			} else {
-				ltlString = "GF(" + ltlString + ".)";//only for the root of each tree
+				ltlString = "GF(" + ltlString + ".)";// only for the root of
+														// each tree
 			}
 		}
 		theStack.push(balID); // push it
-		int mostRecentPop=-1;
+		int mostRecentPop = -1;
 
 		while (!theStack.isEmpty()) // until stack empty,
 		{
-			
+
 			// get an unvisited vertex adjacent to stack top
 			int v = getAdjUnvisitedVertex(theStack.peek());
 			if (v == -1) {// if no such vertex,
@@ -171,13 +172,15 @@ class Graph {
 				popFlag = true;
 				mostRecentPop = theStack.pop();
 				String[] splitStrings = ltlString.split("\\.");
-				ltlString = splitStrings[0] + ")." + splitStrings[1].replaceFirst("\\)", "");
-				
+				ltlString = splitStrings[0] + ")."
+						+ splitStrings[1].replaceFirst("\\)", "");
+
 			} else // if it exists,
 			{
-				vertexList[v].wasVisited = true; // mark it
 				String[] splitStrings = ltlString.split("\\.");
 				String tempString = "";
+
+				vertexList[v].wasVisited = true; // mark it
 
 				if (DrawView.colorballs[v - 1].isPickObject()) {
 					tempString = !tempString.isEmpty() ? tempString
@@ -204,103 +207,183 @@ class Graph {
 				}
 
 				tempString = v + tempString;
+				// vertexList[v].wasVisited = true; // mark it
+				String subTempString = "";
+				if (isCompletelyConnected(v - 1)) {
+
+					for (int i = 0; i < 10; i++) {
+						subTempString = "";
+						if (DrawView.colorballs[v - 1].isLineTo(i + 1)) {
+							// vertexList[v].wasVisited = true; // mark it
+							subTempString = "";
+
+							if (DrawView.colorballs[i].isPickObject()) {
+								subTempString = !tempString.isEmpty() ? tempString
+										+ " && F( PickObj )"
+										: "F( PickObj )";
+							}
+							if (DrawView.colorballs[i].isActivateSensor()) {
+								subTempString = !tempString.isEmpty() ? tempString
+										+ " && F( ActSen )"
+										: "F( ActSen )";
+							}
+							if (DrawView.colorballs[i].isDropObject()) {
+								subTempString = !tempString.isEmpty() ? tempString
+										+ " && F( DropObj )"
+										: "F( DropObj )";
+							}
+							if (DrawView.colorballs[i].isDeactivateSensor()) {
+								subTempString = !tempString.isEmpty() ? tempString
+										+ " && F( DeactSen )"
+										: "F( DeactSen )";
+							}
+
+							if (DrawView.colorballs[i].isPickObject()
+									|| DrawView.colorballs[i]
+											.isDropObject()
+									|| DrawView.colorballs[i]
+											.isActivateSensor()
+									|| DrawView.colorballs[i]
+											.isDeactivateSensor()) {
+								subTempString = " U( " + tempString + ")";
+							}
+
+							subTempString = (i+1) + subTempString;
+						}
+						if (tempString == "") {
+							tempString = subTempString;
+						} else {
+							if (subTempString != "")
+								tempString = tempString + " || "
+										+ subTempString;
+						}
+
+					}
+					if (tempString != "")
+						tempString = "(" + tempString + ")";
+				}
 
 				if (!DrawView.colorballs[v - 1].isValid()) {
-					if(DrawView.colorballs[v-1].isEventually()){
-						if(firstImplication){
-					tempString = "=>(NOT(" + tempString + ")U(" + generateNotString(theStack.peek(), v)+ ").)";
-					firstImplication = false;
-						}
-						else{
-							if(DrawView.colorballs[theStack.peek()-1].isValid()){
-							tempString = " && (NOT(" + tempString + ")U(" + generateNotString(theStack.peek(), v)+ ").)";
-							}else{
-								tempString = "(NOT(" + tempString + ")U(" + generateNotString(theStack.peek(), v)+ ").)";
+					if (DrawView.colorballs[v - 1].isEventually()) {
+						if (firstImplication) {
+							// tempString = "=>(NOT(" + tempString + ")U(" +
+							// generateNotString(theStack.peek(), v)+ ").)";
+							tempString = "=> X(NOT(" + tempString + ").)";
+							ltlString = ltlString.replace("F", "G");
+							splitStrings = ltlString.split("\\.");
+							firstImplication = false;
+						} else {
+							if (DrawView.colorballs[theStack.peek() - 1]
+									.isValid()) {
+								tempString = " && (NOT(" + tempString + ")U("
+										+ generateNotString(theStack.peek(), v)
+										+ ").)";
+							} else {
+								tempString = "(NOT(" + tempString + ")U("
+										+ generateNotString(theStack.peek(), v)
+										+ ").)";
 							}
 						}
-					}else{
-						//tempString = "G (NOT(" + tempString + ".))";//need to test it more
-						tempString = "=>X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
+					} else {
+						// tempString = "G (NOT(" + tempString + ".))";//need to
+						// test it more
+						// tempString = "=>X(NOT(" +
+						// generateNotString(theStack.peek(), v) + "))U(" +
+						// tempString + ".)";
+						tempString = "=> X(NOT(" + tempString + ").)";
+						ltlString = ltlString.replace("F", "G");
+						splitStrings = ltlString.split("\\.");
 					}
 				} else {
-					if(!DrawView.colorballs[v-1].isEventually()){
-						if(firstImplication){
-							if(DrawView.colorballs[theStack.peek()-1].isValid()){
-						tempString = "(X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".))";
-							}else{
-								tempString = "X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
+					if (!DrawView.colorballs[v - 1].isEventually()) {
+						if (firstImplication) {
+							if (DrawView.colorballs[theStack.peek() - 1]
+									.isValid()) {
+								tempString = "(X(NOT("
+										+ generateNotString(theStack.peek(), v)
+										+ "))U(" + tempString + ".))";
+							} else {
+								tempString = "X(NOT("
+										+ generateNotString(theStack.peek(), v)
+										+ "))U(" + tempString + ".)";
 							}
-						//firstImplication=false;
-						}else{
-							tempString = "X(NOT(" + generateNotString(theStack.peek(), v) + "))U(" + tempString + ".)";
+							// firstImplication=false;
+						} else {
+							tempString = "X(NOT("
+									+ generateNotString(theStack.peek(), v)
+									+ "))U(" + tempString + ".)";
 						}
-					}else{
-						if(DrawView.colorballs[theStack.peek()-1].isValid()){
-					tempString = "((F(" + tempString + ".)))";
-						}else{
-							tempString = "((" + tempString + ".))";//check
+					} else {
+						if (DrawView.colorballs[theStack.peek() - 1].isValid()) {
+							tempString = "((F(" + tempString + ".)))";
+						} else {
+							tempString = "((" + tempString + ".))";// check
 						}
 					}
 				}
 				if (!popFlag) {
-					//int x = theStack.peekPrev();
-					//int y = theStack.peek();
+					// int x = theStack.peekPrev();
+					// int y = theStack.peek();
 					if (DrawView.colorballs[theStack.peek() - 1].isValid()) {
-						if(DrawView.colorballs[v-1].isValid()){
-							if(!DrawView.colorballs[v-1].isEventually()){
-								if(firstImplication){
-								ltlString = splitStrings[0] + " => " + tempString
-									+ splitStrings[1];
-								}else{
-									ltlString = splitStrings[0] + " && " + tempString
-											+ splitStrings[1];
-									firstImplication=false;
+						if (DrawView.colorballs[v - 1].isValid()) {
+							if (!DrawView.colorballs[v - 1].isEventually()) {
+								if (firstImplication) {
+									ltlString = splitStrings[0] + " => "
+											+ tempString + splitStrings[1];
+								} else {
+									ltlString = splitStrings[0] + " && "
+											+ tempString + splitStrings[1];
+									firstImplication = false;
 								}
-							}else{
-								ltlString = splitStrings[0] + " && " + tempString
-										+ splitStrings[1];
+							} else {
+								ltlString = splitStrings[0] + " && "
+										+ tempString + splitStrings[1];
 							}
-						}else{
-							if(!DrawView.colorballs[v-1].isEventually()){
-								ltlString = splitStrings[0] + tempString//test this case
-									+ splitStrings[1];
-							}else{
+						} else {
+							if (!DrawView.colorballs[v - 1].isEventually()) {
+								ltlString = splitStrings[0] + tempString// test
+																		// this
+																		// case
+										+ splitStrings[1];
+							} else {
 								ltlString = splitStrings[0] + tempString
 										+ splitStrings[1];
 							}
-							
+
 						}
 					} else {
-						if(!DrawView.colorballs[v-1].isEventually()){
-							ltlString = splitStrings[0] + ")=>("+ tempString
-								+ splitStrings[1];
-						}else{
+						if (!DrawView.colorballs[v - 1].isEventually()) {
+							ltlString = splitStrings[0] + ")=>(" + tempString
+									+ splitStrings[1];
+						} else {
 							ltlString = splitStrings[0] + ") U (" + tempString
 									+ splitStrings[1];
 						}
-						
+
 					}
 				} else {
-					if(!DrawView.colorballs[theStack.peek()-1].isORMode()){
-					ltlString = splitStrings[0] + ") && (" + tempString
-							+ splitStrings[1];
-					}else{
-						if(mostRecentPop>0 && !DrawView.colorballs[mostRecentPop-1].isEventually()){
-							ltlString = splitStrings[0] + " || " + tempString 
-									+ splitStrings[1];
-						}else{
-							ltlString = splitStrings[0] + ") || (" + tempString 
+					if (!DrawView.colorballs[theStack.peek() - 1].isORMode()) {
+						ltlString = splitStrings[0] + ") && (" + tempString
 								+ splitStrings[1];
+					} else {
+						if (mostRecentPop > 0
+								&& !DrawView.colorballs[mostRecentPop - 1]
+										.isEventually()) {
+							ltlString = splitStrings[0] + " || " + tempString
+									+ splitStrings[1];
+						} else {
+							ltlString = splitStrings[0] + ") || (" + tempString
+									+ splitStrings[1];
 						}
 					}
 					popFlag = false;
 				}
 
 				theStack.push(v); // push it
-				mostRecentPop=-1;
+				mostRecentPop = -1;
 			}
 		} // end while
-firstImplication=true;
+		firstImplication = true;
 		// stack is empty, so we're done
 		for (int j = 0; j < nVerts; j++)
 			// reset flags
@@ -314,21 +397,28 @@ firstImplication=true;
 	public String getLtlString() {
 		return ltlString;
 	}
-	
-	public String generateNotString(int fromBalID, int toBalID){//generates the string for part of ordered locomotion
-		String notString="";
-		for(int i = 0;i<10;i++){
-			int tempBalID = i+1;
-			if( i!=(toBalID-1) /*&& i!=(fromBalID-1)*/ && MainActivity.waypoint[i]){
-				if(notString==""){
-					
-					notString ="" +  tempBalID;
-				}else{
+
+	public String generateNotString(int fromBalID, int toBalID) {// generates
+																	// the
+																	// string
+																	// for part
+																	// of
+																	// ordered
+																	// locomotion
+		String notString = "";
+		for (int i = 0; i < 10; i++) {
+			int tempBalID = i + 1;
+			if (i != (toBalID - 1) /* && i!=(fromBalID-1) */
+					&& MainActivity.waypoint[i]) {
+				if (notString == "") {
+
+					notString = "" + tempBalID;
+				} else {
 					notString = notString + " || " + tempBalID;
 				}
 			}
 		}
-		if(notString.equals(""))
+		if (notString.equals(""))
 			return "False";
 		return notString;
 	}
@@ -339,6 +429,44 @@ firstImplication=true;
 				return j;
 		return -1;
 	} // end getAdjUnvisitedVertex()
+
+	public boolean isCompletelyConnected(int index) {
+		boolean flags[] = new boolean[10];
+		int edgeCount = 0;
+		int nodeCount = 1;
+		flags[index] = true;
+		/*for (int i = 0; i < 10; i++) {
+			if (DrawView.colorballs[index].isLineTo(i + 1)) {
+				flags[i] = true;
+				nodeCount++;
+			}
+		}*/
+		for(int i=0;i<10;i++){
+			for(int j=0;j<10;j++){
+				if(DrawView.colorballs[i].isLineTo(j+1) && ((flags[i] &&!flags[j]) || (flags[j] &&!flags[i]))){
+					flags[i] = flags[j] = true;
+					nodeCount++;
+				}
+			}
+		}
+		
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				if (flags[i] && flags[j]) {
+					if (DrawView.colorballs[i].isLineTo(j + 1)) {
+						edgeCount++;
+					}
+				}
+			}
+		}
+		if ((nodeCount * (nodeCount - 1)) / 2 == edgeCount/2) {
+			return true;
+		}
+		return false;
+
+	}
+	
+	
 
 	// ------------------------------------------------------------
 } // end class Graph

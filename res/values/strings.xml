@@ -5,7 +5,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="number_waypoints">Number of Waypoints</string>
-    <string name="select_map">Select Map</string>
+    <string name="select_map">Add Map</string>
     <string-array name="number_waypoints">
         <item >0</item>
         <item >1</item>
@@ -22,8 +22,8 @@
     
     <string name="waypoint_prompt">select</string>
     <string name="transfer_ltl">Upload LTL</string>
-    <string name="upload_ltl">Upload LTL</string>
-    <string name="add_mission">Add Mission</string>
-    <string name="del_mission">Del Mission</string>
+    <string name="upload_ltl">Upload </string>
+    <string name="add_mission">Mission</string>
+    <string name="del_mission">Mission</string>
 
 </resources>

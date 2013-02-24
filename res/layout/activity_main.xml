@@ -16,19 +16,22 @@
             android:id="@+id/selectMap"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/select_map" />
+            android:text="@string/select_map"
+            android:drawableLeft="@drawable/map" />
         
         <Button
             android:id="@+id/addMission"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/add_mission" />
+            android:text="@string/add_mission"
+            android:drawableLeft="@drawable/add" />
         
         <Button
             android:id="@+id/delMission"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/del_mission" />
+            android:text="@string/del_mission" 
+            android:drawableLeft="@drawable/remove"/>
         
          <Button
             android:id="@+id/transferLTL"
@@ -40,7 +43,8 @@
             android:id="@+id/uploadLTL"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/upload_ltl" />
+            android:text="@string/upload_ltl" 
+            android:drawableLeft="@drawable/upload" />
 
        
     
