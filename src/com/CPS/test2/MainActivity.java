@@ -28,6 +28,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +49,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	Bitmap bmp;
 	static Bitmap scaledBitmap;
 	static Bitmap alteredBitmap;
+	RadioGroup robotGroup;
 	
 	
 	
@@ -88,6 +91,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	private static final String appKey = "6j4m2i10o3v8o6a";
 	private static final String appSecret = "n7umsheli0ppuui";
 	private static final int REQUEST_LINK_TO_DBX = 0;
+	private String uploadFileName ="ltl_string_r1.txt";
 
 	private TextView mTestOutput;
 	static TextView mCurrentLtlOutput;
@@ -558,16 +562,24 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 					hyperFinalString = hyperFinalString + "&&" + s;
 				}
 			}
+			hyperFinalString = hyperFinalString.replace("F", "<>");
+			hyperFinalString = hyperFinalString.replace("G","[]");
+			hyperFinalString = hyperFinalString.replace("NOT", "!");
 			mTestOutput.setText(hyperFinalString);
 			String length = "" + hyperFinalString.length();
 			final String TEST_DATA = length + "\n" + hyperFinalString;
 
-			final String TEST_FILE_NAME = "ltl_string.txt";
+			final String TEST_FILE_NAME = uploadFileName;//"ltl_string.txt";
 			DbxPath testPath = new DbxPath(DbxPath.ROOT, TEST_FILE_NAME);
 
 			// Create DbxFileSystem for synchronized file access.
 			DbxFileSystem dbxFs = DbxFileSystem.forAccount(mDbxAcctMgr
 					.getLinkedAccount());
+			
+			if (!dbxFs.exists(testPath)) {
+				DbxFile testFile = dbxFs.create(testPath);
+				testFile.close();
+			}
 
 			if (dbxFs.exists(testPath)) {
 
@@ -586,7 +598,27 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		} catch (IOException e) {
 			mTestOutput.setText("Dropbox test failed: " + e);
 		}
+		
+		
 
+	}
+	public void onRadioButtonClicked(View view) {
+	    // Is the button now checked?
+	    boolean checked = ((RadioButton) view).isChecked();
+	    
+	    // Check which radio button was clicked
+	    switch(view.getId()) {
+	        case R.id.robot1:
+	            if (checked)
+	            	uploadFileName = "ltl_string_r1.txt";
+	                // Pirates are the best
+	            break;
+	        case R.id.robot2:
+	            if (checked)
+	            	uploadFileName = "ltl_string_r2.txt";
+	                // Ninjas rule
+	            break;
+	    }
 	}
 
 }

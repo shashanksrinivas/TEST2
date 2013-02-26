@@ -137,7 +137,7 @@ class Graph {
 			ltlString = " U( " + ltlString + ")";
 		}
 
-		ltlString = balID + ltlString;
+		ltlString = "q" + balID + ltlString;
 
 		if (!DrawView.colorballs[balID - 1].isValid()) {
 			ltlString = "G (NOT(" + ltlString + ".))";
@@ -206,7 +206,7 @@ class Graph {
 					tempString = " U( " + tempString + ")";
 				}
 
-				tempString = v + tempString;
+				tempString = "q"+ v + tempString;
 				// vertexList[v].wasVisited = true; // mark it
 				String subTempString = "";
 				if (isCompletelyConnected(v - 1)) {
@@ -248,7 +248,7 @@ class Graph {
 								subTempString = " U( " + tempString + ")";
 							}
 
-							subTempString = (i+1) + subTempString;
+							subTempString = "q" + (i+1) + subTempString;
 						}
 						if (tempString == "") {
 							tempString = subTempString;

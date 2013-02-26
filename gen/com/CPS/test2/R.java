@@ -70,17 +70,19 @@ public final class R {
     }
     public static final class id {
         public static final int addMission=0x7f090003;
-        public static final int arrow_down=0x7f090017;
-        public static final int arrow_up=0x7f090016;
-        public static final int currentLtlTextView=0x7f090013;
+        public static final int arrow_down=0x7f090019;
+        public static final int arrow_up=0x7f090018;
+        public static final int currentLtlTextView=0x7f090015;
         public static final int delMission=0x7f090004;
         public static final int draw_view=0x7f090012;
         public static final int iv_icon=0x7f090000;
         public static final int ltlTextView=0x7f090011;
-        public static final int menu_settings=0x7f090018;
-        public static final int scroller=0x7f090014;
+        public static final int menu_settings=0x7f09001a;
+        public static final int robot1=0x7f090013;
+        public static final int robot2=0x7f090014;
+        public static final int scroller=0x7f090016;
         public static final int selectMap=0x7f090002;
-        public static final int tracks=0x7f090015;
+        public static final int tracks=0x7f090017;
         public static final int transferLTL=0x7f090005;
         public static final int tv_title=0x7f090001;
         public static final int uploadLTL=0x7f090006;
