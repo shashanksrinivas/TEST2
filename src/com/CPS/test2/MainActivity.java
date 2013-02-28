@@ -17,6 +17,8 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,6 +52,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	static Bitmap scaledBitmap;
 	static Bitmap alteredBitmap;
 	RadioGroup robotGroup;
+	private int mCurrentMission=0;
 	
 	
 	
@@ -85,6 +88,9 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 
 	static boolean waypoint[] = new boolean[10];// keeps the status of waypoints
 												// (enabled/disabled)
+	
+	static LinkedList<ColorBall> currentColorBallList = new LinkedList<ColorBall>();
+	static LinkedList<LinkedList<ColorBall>> listOfColorBallLists = new LinkedList<LinkedList<ColorBall>>();
 
 	// dropbox related allocations
 	private DbxAccountManager mDbxAcctMgr;
@@ -99,6 +105,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	private Button mUploadStringButton;
 	private Button mDelMissionButton;
 	private Button mAddMissionButton;
+	private Button mPreviewLtlButton;
 
 	static LinkedList<String> stringList = new LinkedList<String>();
 
@@ -298,7 +305,11 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				if (!stringList.isEmpty())
-					stringList.removeLast();
+				{
+					stringList.removeLast();//remove string and associated colorball list
+					listOfColorBallLists.remove(listOfColorBallLists.size()-1);
+					
+				}
 				mTestOutput.setText("");
 				for(String s: stringList){
 					mTestOutput.append("¥ " + s + "\n");
@@ -318,7 +329,32 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 				for(String s: stringList){
 					mTestOutput.append("¥ " + s + "\n");
 				}
+				currentColorBallList.clear();
+				for(int i=0;i<10;i++){
+					if(true){//create colorball list 
+						ColorBall tempBall = new ColorBall(DrawView.colorballs[i]);
+					currentColorBallList.add(tempBall);
+					}
+				}
+				listOfColorBallLists.add(currentColorBallList);//add colorball list to list of colorball lists
+				mCurrentMission = listOfColorBallLists.size();
+				//debug
+				for(int i=0;i<mCurrentMission;i++){
+				ColorBall temp = listOfColorBallLists.get(i).get(0);
+				int y=0;
+				}
 
+			}
+		});
+		
+		mPreviewLtlButton = (Button) findViewById(R.id.previewLtlButton);
+		registerForContextMenu(mPreviewLtlButton);
+		mPreviewLtlButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				dv.showContextMenu();
 			}
 		});
 
@@ -330,35 +366,25 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		if (item.getTitle() == "Pick up Object") {
-
-			DrawView.colorballs[DrawView.balID - 1].togglePickObject();
-		} else if (item.getTitle() == "Drop Object") {
-			DrawView.colorballs[DrawView.balID - 1].toggleDropObject();
-		} else if (item.getTitle() == "Activate Sensor") {
-			DrawView.colorballs[DrawView.balID - 1].toggleActivateSensor();
-		} else if (item.getTitle() == "Deactivate Sensor") {
-			DrawView.colorballs[DrawView.balID - 1].toggleDeactivateSensor();
-		} else if (item.getTitle() == "Toggle Location") {
-			//DrawView.colorballs[DrawView.balID - 1].setClickState(1);
-			//DrawView.fromBalID = DrawView.balID;
-			if (DrawView.colorballs[DrawView.balID - 1].isValid()) {
-				DrawView.colorballs[DrawView.balID - 1].setValid(false);
-			} else {
-				DrawView.colorballs[DrawView.balID - 1].setValid(true);
+		
+		int index=0;
+		for(String s: stringList){
+			if(item.getTitle() == s){
+				mCurrentMission = index;
+				
+				LinkedList<ColorBall> tempList = listOfColorBallLists.get(index) ;
+				//debug
+				
+				for(int i=0;i<10;i++){
+					//if(waypoint[i])
+					DrawView.colorballs[i].copy(tempList.get(i));
+					int x = tempList.get(0).getX();
+					int y = tempList.get(0).getY();
+				}
 			}
-			
-		}else if(item.getTitle() == "Toggle Always"){
-			DrawView.colorballs[DrawView.balID - 1].toggleAlways();
-		}else if(item.getTitle() == "Toggle Eventually"){
-			DrawView.colorballs[DrawView.balID - 1].toggleEventually();
-		}
-
-		else {
-			return false;
+			index++;
 		}
 		return true;
-		// return super.onContextItemSelected(item);
 	}
 
 	@Override
@@ -420,33 +446,43 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		switch (buttonView.getId()) {
 		case R.id.wayPoint1:
 			waypoint[0] = isChecked;
+			dv.colorballs[0].setEnabled(isChecked);
 			break;
 		case R.id.wayPoint2:
 			waypoint[1] = isChecked;
+			DrawView.colorballs[1].setEnabled(isChecked);
 			break;
 		case R.id.wayPoint3:
 			waypoint[2] = isChecked;
+			DrawView.colorballs[2].setEnabled(isChecked);
 			break;
 		case R.id.wayPoint4:
 			waypoint[3] = isChecked;
+			DrawView.colorballs[3].setEnabled(isChecked);
 			break;
 		case R.id.wayPoint5:
 			waypoint[4] = isChecked;
+			DrawView.colorballs[4].setEnabled(isChecked);
 			break;
 		case R.id.wayPoint6:
 			waypoint[5] = isChecked;
+			DrawView.colorballs[5].setEnabled(isChecked);
 			break;
 		case R.id.wayPoint7:
 			waypoint[6] = isChecked;
+			DrawView.colorballs[6].setEnabled(isChecked);
 			break;
 		case R.id.wayPoint8:
 			waypoint[7] = isChecked;
+			DrawView.colorballs[7].setEnabled(isChecked);
 			break;
 		case R.id.wayPoint9:
 			waypoint[8] = isChecked;
+			DrawView.colorballs[8].setEnabled(isChecked);
 			break;
 		case R.id.wayPoint10:
 			waypoint[9] = isChecked;
+			DrawView.colorballs[9].setEnabled(isChecked);
 			break;
 		}
 
@@ -457,7 +493,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		super.onResume();
 		if (mDbxAcctMgr.hasLinkedAccount()) {
 			showLinkedView();
-			doDropboxTest();
+			//doDropboxTest();
 		} else {
 			showUnlinkedView();
 		}
@@ -620,5 +656,23 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	            break;
 	    }
 	}
+
+
+
+
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		// TODO Auto-generated method stub
+		//menu.add("hello");
+		super.onCreateContextMenu(menu, v, menuInfo);
+		
+		for(String s: stringList){
+			menu.add(s);
+		}
+	}
+	
+	
 
 }

@@ -112,6 +112,9 @@ class Graph {
 		String ltlString = "";
 		// String mainString = "";
 		boolean popFlag = false;
+		
+		if(isLineToRootNodeWithArrows(balID))
+			return "";
 
 		if (DrawView.colorballs[balID - 1].isPickObject()) {
 			ltlString = !ltlString.isEmpty() ? ltlString + " && F( PickObj )"
@@ -138,7 +141,89 @@ class Graph {
 		}
 
 		ltlString = "q" + balID + ltlString;
+		
+		String subTempString = "";
+		if (isCompletelyConnected(balID - 1) && isLineToRootNodeWithoutArrows(balID)) {
 
+			for (int i = 0; i < 10; i++) {
+				subTempString = "";
+				if (DrawView.colorballs[balID - 1].isLineTo(i + 1)) {
+					// vertexList[v].wasVisited = true; // mark it
+					subTempString = "";
+
+					if (DrawView.colorballs[i].isPickObject()) {
+						subTempString = !subTempString.isEmpty() ? subTempString
+								+ " && F( PickObj )"
+								: "F( PickObj )";
+					}
+					if (DrawView.colorballs[i].isActivateSensor()) {
+						subTempString = !subTempString.isEmpty() ? subTempString
+								+ " && F( ActSen )"
+								: "F( ActSen )";
+					}
+					if (DrawView.colorballs[i].isDropObject()) {
+						subTempString = !subTempString.isEmpty() ? subTempString
+								+ " && F( DropObj )"
+								: "F( DropObj )";
+					}
+					if (DrawView.colorballs[i].isDeactivateSensor()) {
+						subTempString = !subTempString.isEmpty() ? subTempString
+								+ " && F( DeactSen )"
+								: "F( DeactSen )";
+					}
+
+					if (DrawView.colorballs[i].isPickObject()
+							|| DrawView.colorballs[i]
+									.isDropObject()
+							|| DrawView.colorballs[i]
+									.isActivateSensor()
+							|| DrawView.colorballs[i]
+									.isDeactivateSensor()) {
+						subTempString = " U( " + subTempString + ")";
+					}
+
+					subTempString = "q" + (i+1) + subTempString;
+				}
+				if (ltlString == "") {
+					ltlString = subTempString;
+				} else {
+					if (subTempString != "")
+						ltlString = ltlString + " || "
+								+ subTempString;
+				}
+
+			}
+			if (ltlString != "")
+				ltlString = "(" + ltlString + ")";
+			
+		}else{
+			if (DrawView.colorballs[balID - 1].isPickObject()) {
+			ltlString = !ltlString.isEmpty() ? ltlString + " && F( PickObj )"
+					: "F( PickObj )";
+		}
+		if (DrawView.colorballs[balID - 1].isActivateSensor()) {
+			ltlString = !ltlString.isEmpty() ? ltlString + " && F( ActSen )"
+					: "F( ActSen )";
+		}
+		if (DrawView.colorballs[balID - 1].isDropObject()) {
+			ltlString = !ltlString.isEmpty() ? ltlString + " && F( DropObj )"
+					: "F( DropObj )";
+		}
+		if (DrawView.colorballs[balID - 1].isDeactivateSensor()) {
+			ltlString = !ltlString.isEmpty() ? ltlString + " && F( DeactSen )"
+					: "F( DeactSen )";
+		}
+
+		if (DrawView.colorballs[balID - 1].isPickObject()
+				|| DrawView.colorballs[balID - 1].isDropObject()
+				|| DrawView.colorballs[balID - 1].isActivateSensor()
+				|| DrawView.colorballs[balID - 1].isDeactivateSensor()) {
+			ltlString = " U( " + ltlString + ")";
+		}
+		if(ltlString=="")
+		ltlString = "q" + balID + ltlString;
+		}
+//////////////////////
 		if (!DrawView.colorballs[balID - 1].isValid()) {
 			ltlString = "G (NOT(" + ltlString + ".))";
 		} else {
@@ -208,7 +293,7 @@ class Graph {
 
 				tempString = "q"+ v + tempString;
 				// vertexList[v].wasVisited = true; // mark it
-				String subTempString = "";
+				subTempString = "";
 				if (isCompletelyConnected(v - 1)) {
 
 					for (int i = 0; i < 10; i++) {
@@ -408,7 +493,7 @@ class Graph {
 		String notString = "";
 		for (int i = 0; i < 10; i++) {
 			int tempBalID = i + 1;
-			if (i != (toBalID - 1) /* && i!=(fromBalID-1) */
+			if (i != (toBalID - 1) /* && i!=(fromBalID-1) */ && !DrawView.colorballs[toBalID-1].isLineTo(i+1)
 					&& MainActivity.waypoint[i]) {
 				if (notString == "") {
 
@@ -466,6 +551,41 @@ class Graph {
 
 	}
 	
+	public boolean isRoot(int balID) {
+		for (int i = 0; i < 10; i++) {
+			if (DrawView.colorballs[i].isArrowTo(balID))
+				return false;
+
+		}
+		return true;
+	}
+	
+	public boolean isLineToRootNodeWithoutArrows(int balID){
+		for (int i = 0; i < 10; i++) {
+			if (DrawView.colorballs[balID - 1].isLineTo(i + 1)
+					&& isRoot(i + 1)) {
+				for(int j=0;j<10;j++){
+					if(DrawView.colorballs[i].isArrowTo(j+1))
+						return false;
+				}
+				
+			}
+		}return true;
+	}
+	
+	public boolean isLineToRootNodeWithArrows(int balID){
+		for (int i = 0; i < 10; i++) {
+			if (DrawView.colorballs[balID - 1].isLineTo(i + 1)
+					&& isRoot(i + 1)) {
+				for(int j=0;j<10;j++){
+					if(DrawView.colorballs[i].isArrowTo(j+1))
+						return true;
+				}
+				
+			}
+		}return false;
+	}
+	
 	
 
 	// ------------------------------------------------------------
@@ -492,3 +612,7 @@ class DFSApp {
 	} // end main()
 } // end class DFSApp
 // //////////////////////////////////////////////////////////////
+
+
+	
+

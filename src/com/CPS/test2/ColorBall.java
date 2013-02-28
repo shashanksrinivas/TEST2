@@ -43,6 +43,57 @@ public class ColorBall {
 		count++;
 
 	}
+	
+	public ColorBall(ColorBall another){
+		this.activateSensor = another.activateSensor;
+		this.always = another.always;
+		this.clickState = another.clickState;
+		this.coordX = another.coordX;
+		this.coordY = another.coordY;
+		this.deactivateSensor = another.deactivateSensor;
+		this.dropObject = another.dropObject;
+		this.enabled = another.enabled;
+		this.eventually = another.eventually;
+		this.goDown = another.goDown;
+		this.goRight = another.goRight;
+		this.id = another.id;
+		this.imgInvalid = another.imgInvalid;
+		this.imgValid = another.imgValid;
+		this.orMode = another.orMode;
+		this.pickObject = another.pickObject;
+		this.valid = another.valid;
+		this.ltlString = another.ltlString;
+		for(int i=0;i<10;i++){
+			this.arrowTo[i] = another.arrowTo[i];
+			this.lineTo[i] = another.lineTo[i];
+			
+		}
+	}
+	public void copy(ColorBall another){
+		this.activateSensor = another.activateSensor;
+		this.always = another.always;
+		this.clickState = another.clickState;
+		this.coordX = another.coordX;
+		this.coordY = another.coordY;
+		this.deactivateSensor = another.deactivateSensor;
+		this.dropObject = another.dropObject;
+		this.enabled = another.enabled;
+		this.eventually = another.eventually;
+		this.goDown = another.goDown;
+		this.goRight = another.goRight;
+		this.id = another.id;
+		this.imgInvalid = another.imgInvalid;
+		this.imgValid = another.imgValid;
+		this.orMode = another.orMode;
+		this.pickObject = another.pickObject;
+		this.valid = another.valid;
+		this.ltlString = another.ltlString;
+		for(int i=0;i<10;i++){
+			this.arrowTo[i] = another.arrowTo[i];
+			this.lineTo[i] = another.lineTo[i];
+			
+		}
+	}
 
 	public ColorBall(Context context, int drawable1, int drawable2, Point point) {
 
@@ -106,8 +157,8 @@ public class ColorBall {
 		return enabled;
 	}
 
-	public void enable() {
-		enabled = true;
+	public void setEnabled(boolean value) {
+		enabled = value;
 	}
 
 	public void disable() {

@@ -1,6 +1,6 @@
 package com.CPS.test2;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -17,12 +17,13 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class DrawView extends View {
 	static ColorBall[] colorballs = new ColorBall[10]; // array that holds the
 														// balls
+	
+	
 	Graph theGraph = new Graph();// initialize the graph
 	static int balID = 0; // variable to know what ball is being dragged
 	static int fromBalID = 0;
@@ -452,22 +453,7 @@ public class DrawView extends View {
 
 	}
 
-	@Override
-	protected void onCreateContextMenu(ContextMenu menu) {
-		// TODO Auto-generated method stub
-
-		super.onCreateContextMenu(menu);
-		// theGraph.dfs();
-		MainActivity.finalLtlString = computeLtl();
-		menu.setHeaderTitle("LTL: " + computeLtl());
-		menu.add("Toggle Location");
-		menu.add("Toggle Always");
-		menu.add("Toggle Eventually");
-		menu.add("Activate Sensor");
-		menu.add("Deactivate Sensor");
-		menu.add("Pick up Object");
-		menu.add("Drop Object");
-	}
+	
 
 	public String computeLtl() {
 		// LinkedList<String> orStrings = new LinkedList<String>();
@@ -478,7 +464,7 @@ public class DrawView extends View {
 			String tmpString = "";
 			if (MainActivity.waypoint[i] && isRoot(colorballs[i].getID())
 					&& !visited[i]
-					&& !isLineToNonRootNode(colorballs[i].getID())) {
+					&& !isLineToNonRootNode(colorballs[i].getID()) ) {
 				tmpString = theGraph.dfs(colorballs[i].getID());
 				/*
 				 * if (string == "") { string = string +
@@ -486,7 +472,7 @@ public class DrawView extends View {
 				 */
 				// boolean or = false;
 				for (int j = 0; j < 10; j++) {
-					if (colorballs[i].isLineTo(j + 1) && !visited[j]) {
+					if (colorballs[i].isLineTo(j + 1) && !visited[j] ) {
 						// or = true;
 						visited[i] = true;
 						visited[j] = true;
@@ -530,6 +516,42 @@ public class DrawView extends View {
 
 		return string;
 	}
+	
+	public boolean isCompletelyConnected(int index) {
+		boolean flags[] = new boolean[10];
+		int edgeCount = 0;
+		int nodeCount = 1;
+		flags[index] = true;
+		/*for (int i = 0; i < 10; i++) {
+			if (DrawView.colorballs[index].isLineTo(i + 1)) {
+				flags[i] = true;
+				nodeCount++;
+			}
+		}*/
+		for(int i=0;i<10;i++){
+			for(int j=0;j<10;j++){
+				if(DrawView.colorballs[i].isLineTo(j+1) && ((flags[i] &&!flags[j]) || (flags[j] &&!flags[i]))){
+					flags[i] = flags[j] = true;
+					nodeCount++;
+				}
+			}
+		}
+		
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				if (flags[i] && flags[j]) {
+					if (DrawView.colorballs[i].isLineTo(j + 1)) {
+						edgeCount++;
+					}
+				}
+			}
+		}
+		if ((nodeCount * (nodeCount - 1)) / 2 == edgeCount/2) {
+			return true;
+		}
+		return false;
+
+	}
 
 	public boolean isRoot(int balID) {
 		for (int i = 0; i < 10; i++) {
@@ -549,7 +571,46 @@ public class DrawView extends View {
 		}
 		return false;
 	}
+	
+	public boolean isLineToRootNodeWithoutArrows(int balID){
+		for (int i = 0; i < 10; i++) {
+			if (DrawView.colorballs[balID - 1].isLineTo(i + 1)
+					&& isRoot(i + 1)) {
+				for(int j=0;j<10;j++){
+					if(colorballs[i].isArrowTo(j+1))
+						return false;
+				}
+				
+			}
+		}return true;
+		
+	}
+	public boolean isLineToRootNodeWithArrows(int balID){
+		for (int i = 0; i < 10; i++) {
+			if (DrawView.colorballs[balID - 1].isLineTo(i + 1)
+					&& isRoot(i + 1)) {
+				for(int j=0;j<10;j++){
+					if(DrawView.colorballs[i].isArrowTo(j+1))
+						return true;
+				}
+				
+			}
+		}return false;
+	}
 
+	public boolean hasNoLineToRootNodeWithArrows(int balID){
+		for (int i = 0; i < 10; i++) {
+			if (DrawView.colorballs[balID - 1].isLineTo(i + 1)
+					&& isRoot(i + 1)) {
+				for(int j=0;j<10;j++){
+					if(DrawView.colorballs[i].isArrowTo(j+1))
+						return false;
+				}
+				
+			}
+		}return true;
+	}
+	
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		// TODO Auto-generated method stub

@@ -115,6 +115,19 @@
             android:paddingRight="20dp"
             android:text="10" />
     </LinearLayout>
+    
+    <LinearLayout 
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0px" >
+        
+        <Button
+            android:id="@+id/previewLtlButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Preview LTL" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
