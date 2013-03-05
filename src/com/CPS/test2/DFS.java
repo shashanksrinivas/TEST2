@@ -113,7 +113,8 @@ class Graph {
 		// String mainString = "";
 		boolean popFlag = false;
 		
-		if(isLineToRootNodeWithArrows(balID))
+		
+		if(isLineToRootNodeWithArrows(balID) && !hasArrows(balID))
 			return "";
 
 		if (DrawView.colorballs[balID - 1].isPickObject()) {
@@ -149,6 +150,7 @@ class Graph {
 				subTempString = "";
 				if (DrawView.colorballs[balID - 1].isLineTo(i + 1)) {
 					// vertexList[v].wasVisited = true; // mark it
+					DrawView.visited[i] = true;//mark it so that duplication is avoided
 					subTempString = "";
 
 					if (DrawView.colorballs[i].isPickObject()) {
@@ -225,7 +227,11 @@ class Graph {
 		}
 //////////////////////
 		if (!DrawView.colorballs[balID - 1].isValid()) {
-			ltlString = "G (NOT(" + ltlString + ".))";
+			if(DrawView.colorballs[balID - 1].isAlways()){
+				ltlString = "G(NOT(" + ltlString + ".))";
+			}else{
+			ltlString = " (NOT(" + ltlString + ".))";
+			}
 		} else {
 			if (!DrawView.colorballs[balID - 1].isAlways()) {
 				if (DrawView.colorballs[balID - 1].isEventually()) {
@@ -235,8 +241,13 @@ class Graph {
 							+ ")U(" + ltlString + ".)";
 				}
 			} else {
+				if(DrawView.colorballs[balID - 1].isEventually()){
 				ltlString = "GF(" + ltlString + ".)";// only for the root of
 														// each tree
+				}else{
+					ltlString = "G(" + ltlString + ".)";// only for the root of
+					// each tree
+				}
 			}
 		}
 		theStack.push(balID); // push it
@@ -353,8 +364,12 @@ class Graph {
 						if (firstImplication) {
 							// tempString = "=>(NOT(" + tempString + ")U(" +
 							// generateNotString(theStack.peek(), v)+ ").)";
+							if(!DrawView.colorballs[theStack.peek()-1].isValid()){
+								tempString = " && (X(" + tempString + ").)";
+							}else{
 							tempString = "=> X(NOT(" + tempString + ").)";
 							ltlString = ltlString.replace("F", "G");
+							}
 							splitStrings = ltlString.split("\\.");
 							firstImplication = false;
 						} else {
@@ -364,9 +379,8 @@ class Graph {
 										+ generateNotString(theStack.peek(), v)
 										+ ").)";
 							} else {
-								tempString = "(NOT(" + tempString + ")U("
-										+ generateNotString(theStack.peek(), v)
-										+ ").)";
+								tempString = " && (X(" + tempString + ").)";
+										
 							}
 						}
 					} else {
@@ -411,19 +425,20 @@ class Graph {
 					// int y = theStack.peek();
 					if (DrawView.colorballs[theStack.peek() - 1].isValid()) {
 						if (DrawView.colorballs[v - 1].isValid()) {
-							if (!DrawView.colorballs[v - 1].isEventually()) {
-								if (firstImplication) {
+							//if (!DrawView.colorballs[v - 1].isEventually()) {
+								if (DrawView.colorballs[v - 1].isImplies()) {
 									ltlString = splitStrings[0] + " => "
 											+ tempString + splitStrings[1];
+									firstImplication=false;
 								} else {
 									ltlString = splitStrings[0] + " && "
 											+ tempString + splitStrings[1];
 									firstImplication = false;
 								}
-							} else {
-								ltlString = splitStrings[0] + " && "
-										+ tempString + splitStrings[1];
-							}
+							//} else {
+							//	ltlString = splitStrings[0] + " && "
+							//			+ tempString + splitStrings[1];
+							//}
 						} else {
 							if (!DrawView.colorballs[v - 1].isEventually()) {
 								ltlString = splitStrings[0] + tempString// test
@@ -441,8 +456,12 @@ class Graph {
 							ltlString = splitStrings[0] + ")=>(" + tempString
 									+ splitStrings[1];
 						} else {
+							if(DrawView.colorballs[v-1].isValid()){
 							ltlString = splitStrings[0] + ") U (" + tempString
 									+ splitStrings[1];
+							}else{
+								ltlString = splitStrings[0] + tempString + splitStrings[1];
+							}
 						}
 
 					}
@@ -497,9 +516,9 @@ class Graph {
 					&& MainActivity.waypoint[i]) {
 				if (notString == "") {
 
-					notString = "" + tempBalID;
+					notString = "" + "q" + tempBalID;
 				} else {
-					notString = notString + " || " + tempBalID;
+					notString = notString + " || " + "q" + tempBalID;
 				}
 			}
 		}
@@ -584,6 +603,15 @@ class Graph {
 				
 			}
 		}return false;
+	}
+	
+	public boolean hasArrows( int balID){
+		for(int i=0;i<10;i++){
+			if(DrawView.colorballs[balID-1].isArrowTo(i+1)){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	

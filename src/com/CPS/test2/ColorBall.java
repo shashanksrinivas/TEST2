@@ -19,6 +19,7 @@ public class ColorBall {
 	private boolean lineTo[] = new boolean[10];
 	private boolean valid = true;//whether you can or can't visit a location
 	private boolean always = false;//for visiting infinitely often
+	private boolean implies = false;
 	private boolean orMode = true;
 	private boolean eventually = true;
 	private boolean pickObject = false;
@@ -58,6 +59,7 @@ public class ColorBall {
 		this.goRight = another.goRight;
 		this.id = another.id;
 		this.imgInvalid = another.imgInvalid;
+		this.implies = another.implies;
 		this.imgValid = another.imgValid;
 		this.orMode = another.orMode;
 		this.pickObject = another.pickObject;
@@ -83,6 +85,7 @@ public class ColorBall {
 		this.goRight = another.goRight;
 		this.id = another.id;
 		this.imgInvalid = another.imgInvalid;
+		this.implies = another.implies;
 		this.imgValid = another.imgValid;
 		this.orMode = another.orMode;
 		this.pickObject = another.pickObject;
@@ -156,7 +159,20 @@ public class ColorBall {
 	public boolean isEnabled() {
 		return enabled;
 	}
+	
+	public boolean isImplies(){
+		return implies;
+	}
+	
+	public void toggleImplies(){
+		implies = !implies;
+		
+	}
 
+	public void setImplies(boolean state){
+		implies = state;
+	}
+	
 	public void setEnabled(boolean value) {
 		enabled = value;
 	}
@@ -165,12 +181,12 @@ public class ColorBall {
 		enabled = false;
 	}
 
-	public void toggleArrowTo(int i) {
-		arrowTo[i - 1] = !arrowTo[i - 1];
+	public void toggleArrowTo(int id) {
+		arrowTo[id - 1] = !arrowTo[id - 1];
 	}
 
-	public boolean isArrowTo(int i) {
-		return arrowTo[i - 1];
+	public boolean isArrowTo(int id) {
+		return arrowTo[id - 1];
 	}
 
 	public void unsetArrowTo(int i) {

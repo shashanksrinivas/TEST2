@@ -32,6 +32,7 @@ public class DrawView extends View {
 	static int toBalIDSingleTap = 0;
 	private int DoubleTapOccurredState = 0;
 	private int orGoToState = 0;
+	static boolean visited[] = new boolean[10];// keeps track of visted nodes
 	private int width;
 	private int height;
 	private int mWindowHeight = this.getHeight();
@@ -44,6 +45,7 @@ public class DrawView extends View {
 			R.drawable.ball_next);
 	Bitmap eventuallyBitmap = BitmapFactory.decodeResource(getResources(),
 			R.drawable.ball_future);
+	Bitmap impliesBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ball_implies);
 	// private boolean secondDoubleTapOccurred = false;
 	Paint paint = new Paint();
 	GestureDetector gestureDetector;
@@ -161,6 +163,23 @@ public class DrawView extends View {
 								nextBitmap,
 								(colorballs[i].getX() + colorballs[j].getX()) / 2,
 								(colorballs[i].getY() + colorballs[j].getY()) / 2,
+								paint);
+					}
+					if(colorballs[j].isImplies()){
+						canvas.drawBitmap(
+								impliesBitmap,
+								((colorballs[i].getX() + colorballs[j].getX()) / 2 +
+								(colorballs[i].getX()))/2,
+								((colorballs[i].getY() + colorballs[j].getY()) / 2 +
+										(colorballs[i].getY()))/2,
+								paint);
+					}else{
+						canvas.drawBitmap(
+								andBitmap,
+								((colorballs[i].getX() + colorballs[j].getX()) / 2 +
+								(colorballs[i].getX()))/2,
+								((colorballs[i].getY() + colorballs[j].getY()) / 2 +
+										(colorballs[i].getY()))/2,
 								paint);
 					}
 
@@ -311,7 +330,7 @@ public class DrawView extends View {
 
 				// if the radius is smaller then 23 (radius of a ball is 22),
 				// then it must be on the ball
-				if (radCircle < 23) {
+				if (radCircle < 23 && MainActivity.waypoint[i]) {
 					balID = colorballs[i].getID();
 					// showContextMenu();
 					callQactionShow();
@@ -458,7 +477,10 @@ public class DrawView extends View {
 	public String computeLtl() {
 		// LinkedList<String> orStrings = new LinkedList<String>();
 		// LinkedList<String> andStrings = new LinkedList<String>();
-		boolean visited[] = new boolean[10];// keeps track of visted nodes
+		//boolean visited[] = new boolean[10];// keeps track of visted nodes
+		for(int i=0;i<10;i++){
+			visited[i] = false;
+		}
 		string = "";
 		for (int i = 0; i < 10; i++) {
 			String tmpString = "";

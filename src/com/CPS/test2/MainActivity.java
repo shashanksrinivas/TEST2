@@ -74,6 +74,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		private static final int ID_DROP = 6;	
 		private static final int ID_ACTSEN = 7;
 		private static final int ID_DEACTSEN = 8;
+		private static final int ID_IMPLIES = 9;
 
 	CheckBox wayPoint1;
 	CheckBox wayPoint2;
@@ -127,7 +128,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
         ActionItem dropItem 	= new ActionItem(ID_DROP, "DROP OBJECT (TRUE/FALSE)", getResources().getDrawable(R.drawable.drop_obj));
         ActionItem actSenItem 		= new ActionItem(ID_ACTSEN, "ACTIVATE SENSOR (TRUE/FALSE)", getResources().getDrawable(R.drawable.activate_sensor));
         ActionItem deactSenItem = new ActionItem(ID_DEACTSEN,"DEACTIVATE SENSOR (TRUE/FALSE)",getResources().getDrawable(R.drawable.deactivate_sensor));
-        
+        ActionItem toggleImplies = new ActionItem(ID_IMPLIES, "TOGGLE IMPLIES (TRUE/FALSE)", getResources().getDrawable(R.drawable.toggle_implies));
         //use setSticky(true) to disable QuickAction dialog being dismissed after an item is clicked
         //prevItem.setSticky(true);
         //nextItem.setSticky(true);
@@ -139,6 +140,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		//add action items into QuickAction
         quickAction.addActionItem(toggleLocItem);
 		quickAction.addActionItem(toggleAlwaysItem);
+		quickAction.addActionItem(toggleImplies);
         quickAction.addActionItem(toggleEventuallyItem);
         quickAction.addActionItem(toggleORModeItem);
         quickAction.addActionItem(pickupItem);
@@ -163,13 +165,20 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 						Toast.makeText(getApplicationContext(), "VISIT SELECTED", Toast.LENGTH_SHORT).show();
 					}
 					
-				} else if (actionId == ID_ALWAYS) {
+				}else if (actionId == ID_ALWAYS) {
 					DrawView.colorballs[DrawView.balID - 1].toggleAlways();
 					if(DrawView.colorballs[DrawView.balID - 1].isAlways()){
 						Toast.makeText(getApplicationContext(), "ALWAYS SELECTED", Toast.LENGTH_SHORT).show();
 					}else{
 					Toast.makeText(getApplicationContext(), "ONCE SELECTED", Toast.LENGTH_SHORT).show();
 					}
+				}else if(actionId == ID_IMPLIES){
+					DrawView.colorballs[DrawView.balID - 1].toggleImplies();
+					if(DrawView.colorballs[DrawView.balID - 1].isImplies()){
+						Toast.makeText(getApplicationContext(), "IMPLIES SELECTED", Toast.LENGTH_SHORT).show();
+						}else{
+							Toast.makeText(getApplicationContext(), "IMPLIES DESELECTED", Toast.LENGTH_SHORT).show();
+						}
 				}else if (actionId == ID_EVENTUALLY) {
 					DrawView.colorballs[DrawView.balID - 1].toggleEventually();
 					if(DrawView.colorballs[DrawView.balID - 1].isEventually()){
