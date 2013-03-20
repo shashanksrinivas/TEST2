@@ -75,6 +75,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		private static final int ID_ACTSEN = 7;
 		private static final int ID_DEACTSEN = 8;
 		private static final int ID_IMPLIES = 9;
+		private static final int ID_ALWAYS_EVENTUALLY = 10;
 
 	CheckBox wayPoint1;
 	CheckBox wayPoint2;
@@ -123,6 +124,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		ActionItem toggleLocItem 	= new ActionItem(ID_LOC, "VISIT / AVOID", getResources().getDrawable(R.drawable.toggle_loc));
 		ActionItem toggleAlwaysItem 	= new ActionItem(ID_ALWAYS, "ONCE / ALWAYS", getResources().getDrawable(R.drawable.toggle_always));
         ActionItem toggleEventuallyItem 	= new ActionItem(ID_EVENTUALLY, "NEXT / LATER", getResources().getDrawable(R.drawable.toggle_eventually));
+        ActionItem toggleAlwaysEventuallyItem 	= new ActionItem(ID_ALWAYS_EVENTUALLY, "Always Eventually OR Eventually Always", getResources().getDrawable(R.drawable.toggle_eventually));
         ActionItem toggleORModeItem = new ActionItem(ID_ORMODE, "OR NEXT(AND)/\nAND NEXT(LATER)", getResources().getDrawable(R.drawable.or_mode));
         ActionItem pickupItem 	= new ActionItem(ID_PICKUP, "PICKUP OBJECT (TRUE/FALSE)", getResources().getDrawable(R.drawable.pickup_obj));
         ActionItem dropItem 	= new ActionItem(ID_DROP, "DROP OBJECT (TRUE/FALSE)", getResources().getDrawable(R.drawable.drop_obj));
@@ -140,6 +142,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		//add action items into QuickAction
         quickAction.addActionItem(toggleLocItem);
 		quickAction.addActionItem(toggleAlwaysItem);
+		quickAction.addActionItem(toggleAlwaysEventuallyItem);
 		quickAction.addActionItem(toggleImplies);
         quickAction.addActionItem(toggleEventuallyItem);
         quickAction.addActionItem(toggleORModeItem);
@@ -185,6 +188,13 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 					Toast.makeText(getApplicationContext(), "LATER SELECTED", Toast.LENGTH_SHORT).show();
 					}else{
 						Toast.makeText(getApplicationContext(), "NEXT SELECTED", Toast.LENGTH_SHORT).show();
+					}
+				}else if (actionId == ID_ALWAYS_EVENTUALLY) {
+					DrawView.colorballs[DrawView.balID - 1].toggleAlwaysEventually();
+					if(DrawView.colorballs[DrawView.balID - 1].isAlwaysEventually()){
+					Toast.makeText(getApplicationContext(), "ALWAYS EVENTUALLY SELECTED", Toast.LENGTH_SHORT).show();
+					}else{
+						Toast.makeText(getApplicationContext(), "EVENTUALLY ALWAYS SELECTED", Toast.LENGTH_SHORT).show();
 					}
 				}else if(actionId == ID_ORMODE){
 					DrawView.colorballs[DrawView.balID - 1].toggleORMode();

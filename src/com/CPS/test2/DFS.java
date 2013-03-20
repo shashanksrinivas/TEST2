@@ -241,10 +241,14 @@ class Graph {
 							+ ")U(" + ltlString + ".)";
 				}
 			} else {
-				if(DrawView.colorballs[balID - 1].isEventually()){
+				if(DrawView.colorballs[balID - 1].isEventually() && DrawView.colorballs[balID -1].isAlwaysEventually()){
 				ltlString = "GF(" + ltlString + ".)";// only for the root of
 														// each tree
-				}else{
+				}else if(DrawView.colorballs[balID - 1].isEventually() && !DrawView.colorballs[balID -1].isAlwaysEventually()){
+					ltlString = "FG(" + ltlString + ".)";// only for the root of
+					// each tree
+				}
+				else{
 					ltlString = "G(" + ltlString + ".)";// only for the root of
 					// each tree
 				}
@@ -301,8 +305,11 @@ class Graph {
 						|| DrawView.colorballs[v - 1].isDeactivateSensor()) {
 					tempString = " U( " + tempString + ")";
 				}
-
-				tempString = "q"+ v + tempString;
+				if(DrawView.colorballs[v-1].isAlways()){
+				tempString = "G q"+ v + tempString;
+				}else{
+					tempString = "q"+ v + tempString;
+				}
 				// vertexList[v].wasVisited = true; // mark it
 				subTempString = "";
 				if (isCompletelyConnected(v - 1)) {
@@ -343,8 +350,11 @@ class Graph {
 											.isDeactivateSensor()) {
 								subTempString = " U( " + tempString + ")";
 							}
-
-							subTempString = "q" + (i+1) + subTempString;
+							if(DrawView.colorballs[i].isAlways()){
+							subTempString = "G q" + (i+1) + subTempString;
+							}else{
+								subTempString = "q" + (i+1) + subTempString;
+							}
 						}
 						if (tempString == "") {
 							tempString = subTempString;
@@ -375,8 +385,10 @@ class Graph {
 						} else {
 							if (DrawView.colorballs[theStack.peek() - 1]
 									.isValid()) {
-								tempString = " && (NOT(" + tempString + ")U("
+								/*tempString = " && (NOT(" + tempString + ")U("
 										+ generateNotString(theStack.peek(), v)
+										+ ").)";*/
+								tempString = " && F(NOT(" + tempString
 										+ ").)";
 							} else {
 								tempString = " && (X(" + tempString + ").)";
@@ -493,6 +505,7 @@ class Graph {
 			// reset flags
 			vertexList[j].wasVisited = false;
 		return ltlString.replace(".", "");
+		
 		// return mainString.replace(".","");
 	} // end dfs
 

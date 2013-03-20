@@ -22,8 +22,7 @@ import android.widget.Toast;
 public class DrawView extends View {
 	static ColorBall[] colorballs = new ColorBall[10]; // array that holds the
 														// balls
-	
-	
+
 	Graph theGraph = new Graph();// initialize the graph
 	static int balID = 0; // variable to know what ball is being dragged
 	static int fromBalID = 0;
@@ -45,7 +44,10 @@ public class DrawView extends View {
 			R.drawable.ball_next);
 	Bitmap eventuallyBitmap = BitmapFactory.decodeResource(getResources(),
 			R.drawable.ball_future);
-	Bitmap impliesBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ball_implies);
+	Bitmap impliesBitmap = BitmapFactory.decodeResource(getResources(),
+			R.drawable.ball_implies);
+	Bitmap alwaysBitmap = BitmapFactory.decodeResource(getResources(),
+			R.drawable.ball_always);
 	// private boolean secondDoubleTapOccurred = false;
 	Paint paint = new Paint();
 	GestureDetector gestureDetector;
@@ -99,6 +101,52 @@ public class DrawView extends View {
 		}
 		paint.setStrokeWidth(3);
 		canvas.drawLine(0, 0, 0, 800, paint);
+		paint.setColor(Color.YELLOW);
+		canvas.drawText("S", 25, 25, paint);
+		paint.setStyle(Paint.Style.FILL);
+		canvas.drawCircle(0, 0, 25, paint);
+
+		for (int i = 0; i < 10; i++) {
+			if (MainActivity.waypoint[i] && isRoot(i + 1)) {
+				canvas.drawLine(0, 0, colorballs[i].getX() + 25,
+						colorballs[i].getY() + 25, paint);
+				if (colorballs[i].isAlwaysEventually()) {
+					if (colorballs[i].isAlways()) {
+						canvas.drawBitmap(alwaysBitmap,
+								(colorballs[i].getX() - 25) / 2,
+								(colorballs[i].getY() - 25) / 2, paint);
+
+					}
+					if (colorballs[i].isEventually()) {
+						canvas.drawBitmap(
+								eventuallyBitmap,
+								(int) ((colorballs[i].getX() - 25) / 2 + colorballs[i]
+										.getX()) / 2, (int) ((colorballs[i]
+										.getY() - 25) / 2 + colorballs[i]
+										.getY()) / 2, paint);
+
+					}
+				} else {
+					if (colorballs[i].isEventually()) {
+						canvas.drawBitmap(eventuallyBitmap,
+								(colorballs[i].getX() - 25) / 2,
+								(colorballs[i].getY() - 25) / 2, paint);
+
+					}
+					if (colorballs[i].isAlways()) {
+						canvas.drawBitmap(
+								alwaysBitmap,
+								(int) ((colorballs[i].getX() - 25) / 2 + colorballs[i]
+										.getX()) / 2,
+								(int) ((colorballs[i].getY() - 25) / 2 + colorballs[i]
+										.getY()) / 2, paint);
+
+					}
+
+				}
+
+			}
+		}
 
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
@@ -165,22 +213,20 @@ public class DrawView extends View {
 								(colorballs[i].getY() + colorballs[j].getY()) / 2,
 								paint);
 					}
-					if(colorballs[j].isImplies()){
+					if (colorballs[j].isImplies()) {
 						canvas.drawBitmap(
 								impliesBitmap,
-								((colorballs[i].getX() + colorballs[j].getX()) / 2 +
-								(colorballs[i].getX()))/2,
-								((colorballs[i].getY() + colorballs[j].getY()) / 2 +
-										(colorballs[i].getY()))/2,
-								paint);
-					}else{
+								((colorballs[i].getX() + colorballs[j].getX()) / 2 + (colorballs[i]
+										.getX())) / 2,
+								((colorballs[i].getY() + colorballs[j].getY()) / 2 + (colorballs[i]
+										.getY())) / 2, paint);
+					} else {
 						canvas.drawBitmap(
 								andBitmap,
-								((colorballs[i].getX() + colorballs[j].getX()) / 2 +
-								(colorballs[i].getX()))/2,
-								((colorballs[i].getY() + colorballs[j].getY()) / 2 +
-										(colorballs[i].getY()))/2,
-								paint);
+								((colorballs[i].getX() + colorballs[j].getX()) / 2 + (colorballs[i]
+										.getX())) / 2,
+								((colorballs[i].getY() + colorballs[j].getY()) / 2 + (colorballs[i]
+										.getY())) / 2, paint);
 					}
 
 					float deltaX = colorballs[j].getX() - colorballs[i].getX();
@@ -408,16 +454,25 @@ public class DrawView extends View {
 				} else if (orGoToState == 1) {
 					toBalIDSingleTap = balID;
 					orGoToState = 0;
-					if (fromBalIDSingleTap != toBalIDSingleTap && MainActivity.waypoint[fromBalIDSingleTap-1] && MainActivity.waypoint[toBalIDSingleTap-1]) {
-						if (colorballs[fromBalIDSingleTap-1]
-								.isArrowTo(toBalIDSingleTap)) {//check for arrows first and override them
-							colorballs[fromBalIDSingleTap - 1].toggleArrowTo(toBalIDSingleTap);
-							theGraph.toggleEdge(fromBalIDSingleTap, toBalIDSingleTap);
+					if (fromBalIDSingleTap != toBalIDSingleTap
+							&& MainActivity.waypoint[fromBalIDSingleTap - 1]
+							&& MainActivity.waypoint[toBalIDSingleTap - 1]) {
+						if (colorballs[fromBalIDSingleTap - 1]
+								.isArrowTo(toBalIDSingleTap)) {// check for
+																// arrows first
+																// and override
+																// them
+							colorballs[fromBalIDSingleTap - 1]
+									.toggleArrowTo(toBalIDSingleTap);
+							theGraph.toggleEdge(fromBalIDSingleTap,
+									toBalIDSingleTap);
 						}
-						if (colorballs[toBalIDSingleTap-1]
+						if (colorballs[toBalIDSingleTap - 1]
 								.isArrowTo(fromBalIDSingleTap)) {
-							colorballs[toBalIDSingleTap - 1].toggleArrowTo(fromBalIDSingleTap);
-							theGraph.toggleEdge(toBalIDSingleTap, fromBalIDSingleTap);
+							colorballs[toBalIDSingleTap - 1]
+									.toggleArrowTo(fromBalIDSingleTap);
+							theGraph.toggleEdge(toBalIDSingleTap,
+									fromBalIDSingleTap);
 						}
 						colorballs[fromBalIDSingleTap - 1]
 								.toggleLineTo(toBalIDSingleTap);
@@ -444,15 +499,15 @@ public class DrawView extends View {
 					toBalID = balID;
 					DoubleTapOccurredState = 0;
 
-					if (fromBalID != toBalID && MainActivity.waypoint[fromBalID-1] && MainActivity.waypoint[toBalID-1]) {
-						if(colorballs[fromBalID-1].isLineTo(toBalID)){
-							colorballs[fromBalID - 1]
-									.toggleLineTo(toBalID);
-							colorballs[toBalID - 1]
-									.toggleLineTo(fromBalID);
-							
+					if (fromBalID != toBalID
+							&& MainActivity.waypoint[fromBalID - 1]
+							&& MainActivity.waypoint[toBalID - 1]) {
+						if (colorballs[fromBalID - 1].isLineTo(toBalID)) {
+							colorballs[fromBalID - 1].toggleLineTo(toBalID);
+							colorballs[toBalID - 1].toggleLineTo(fromBalID);
+
 						}
-						if(colorballs[toBalID-1].isArrowTo(fromBalID)){
+						if (colorballs[toBalID - 1].isArrowTo(fromBalID)) {
 							colorballs[toBalID - 1].toggleArrowTo(fromBalID);
 							theGraph.toggleEdge(toBalID, fromBalID);
 						}
@@ -472,13 +527,11 @@ public class DrawView extends View {
 
 	}
 
-	
-
 	public String computeLtl() {
 		// LinkedList<String> orStrings = new LinkedList<String>();
 		// LinkedList<String> andStrings = new LinkedList<String>();
-		//boolean visited[] = new boolean[10];// keeps track of visted nodes
-		for(int i=0;i<10;i++){
+		// boolean visited[] = new boolean[10];// keeps track of visted nodes
+		for (int i = 0; i < 10; i++) {
 			visited[i] = false;
 		}
 		string = "";
@@ -486,7 +539,7 @@ public class DrawView extends View {
 			String tmpString = "";
 			if (MainActivity.waypoint[i] && isRoot(colorballs[i].getID())
 					&& !visited[i]
-					&& !isLineToNonRootNode(colorballs[i].getID()) ) {
+					&& !isLineToNonRootNode(colorballs[i].getID())) {
 				tmpString = theGraph.dfs(colorballs[i].getID());
 				/*
 				 * if (string == "") { string = string +
@@ -494,7 +547,7 @@ public class DrawView extends View {
 				 */
 				// boolean or = false;
 				for (int j = 0; j < 10; j++) {
-					if (colorballs[i].isLineTo(j + 1) && !visited[j] ) {
+					if (colorballs[i].isLineTo(j + 1) && !visited[j]) {
 						// or = true;
 						visited[i] = true;
 						visited[j] = true;
@@ -538,27 +591,27 @@ public class DrawView extends View {
 
 		return string;
 	}
-	
+
 	public boolean isCompletelyConnected(int index) {
 		boolean flags[] = new boolean[10];
 		int edgeCount = 0;
 		int nodeCount = 1;
 		flags[index] = true;
-		/*for (int i = 0; i < 10; i++) {
-			if (DrawView.colorballs[index].isLineTo(i + 1)) {
-				flags[i] = true;
-				nodeCount++;
-			}
-		}*/
-		for(int i=0;i<10;i++){
-			for(int j=0;j<10;j++){
-				if(DrawView.colorballs[i].isLineTo(j+1) && ((flags[i] &&!flags[j]) || (flags[j] &&!flags[i]))){
+		/*
+		 * for (int i = 0; i < 10; i++) { if
+		 * (DrawView.colorballs[index].isLineTo(i + 1)) { flags[i] = true;
+		 * nodeCount++; } }
+		 */
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				if (DrawView.colorballs[i].isLineTo(j + 1)
+						&& ((flags[i] && !flags[j]) || (flags[j] && !flags[i]))) {
 					flags[i] = flags[j] = true;
 					nodeCount++;
 				}
 			}
 		}
-		
+
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				if (flags[i] && flags[j]) {
@@ -568,7 +621,7 @@ public class DrawView extends View {
 				}
 			}
 		}
-		if ((nodeCount * (nodeCount - 1)) / 2 == edgeCount/2) {
+		if ((nodeCount * (nodeCount - 1)) / 2 == edgeCount / 2) {
 			return true;
 		}
 		return false;
@@ -593,46 +646,47 @@ public class DrawView extends View {
 		}
 		return false;
 	}
-	
-	public boolean isLineToRootNodeWithoutArrows(int balID){
+
+	public boolean isLineToRootNodeWithoutArrows(int balID) {
 		for (int i = 0; i < 10; i++) {
-			if (DrawView.colorballs[balID - 1].isLineTo(i + 1)
-					&& isRoot(i + 1)) {
-				for(int j=0;j<10;j++){
-					if(colorballs[i].isArrowTo(j+1))
+			if (DrawView.colorballs[balID - 1].isLineTo(i + 1) && isRoot(i + 1)) {
+				for (int j = 0; j < 10; j++) {
+					if (colorballs[i].isArrowTo(j + 1))
 						return false;
 				}
-				
+
 			}
-		}return true;
-		
-	}
-	public boolean isLineToRootNodeWithArrows(int balID){
-		for (int i = 0; i < 10; i++) {
-			if (DrawView.colorballs[balID - 1].isLineTo(i + 1)
-					&& isRoot(i + 1)) {
-				for(int j=0;j<10;j++){
-					if(DrawView.colorballs[i].isArrowTo(j+1))
-						return true;
-				}
-				
-			}
-		}return false;
+		}
+		return true;
+
 	}
 
-	public boolean hasNoLineToRootNodeWithArrows(int balID){
+	public boolean isLineToRootNodeWithArrows(int balID) {
 		for (int i = 0; i < 10; i++) {
-			if (DrawView.colorballs[balID - 1].isLineTo(i + 1)
-					&& isRoot(i + 1)) {
-				for(int j=0;j<10;j++){
-					if(DrawView.colorballs[i].isArrowTo(j+1))
+			if (DrawView.colorballs[balID - 1].isLineTo(i + 1) && isRoot(i + 1)) {
+				for (int j = 0; j < 10; j++) {
+					if (DrawView.colorballs[i].isArrowTo(j + 1))
+						return true;
+				}
+
+			}
+		}
+		return false;
+	}
+
+	public boolean hasNoLineToRootNodeWithArrows(int balID) {
+		for (int i = 0; i < 10; i++) {
+			if (DrawView.colorballs[balID - 1].isLineTo(i + 1) && isRoot(i + 1)) {
+				for (int j = 0; j < 10; j++) {
+					if (DrawView.colorballs[i].isArrowTo(j + 1))
 						return false;
 				}
-				
+
 			}
-		}return true;
+		}
+		return true;
 	}
-	
+
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		// TODO Auto-generated method stub

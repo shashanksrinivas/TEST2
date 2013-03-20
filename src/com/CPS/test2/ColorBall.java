@@ -22,6 +22,7 @@ public class ColorBall {
 	private boolean implies = false;
 	private boolean orMode = true;
 	private boolean eventually = true;
+	private boolean alwaysEventually = true;
 	private boolean pickObject = false;
 	private boolean dropObject = false;
 	private boolean activateSensor = false;
@@ -232,6 +233,19 @@ public class ColorBall {
 	
 	public boolean isORMode(){
 		return orMode;
+	}
+	
+	public boolean isAlwaysEventually(){
+		return alwaysEventually;
+	}
+	
+	public void setAlwaysEventually(boolean value){
+		alwaysEventually = value;
+		
+	}
+	
+	public void toggleAlwaysEventually(){
+		alwaysEventually = !alwaysEventually;
 	}
 	
 	public void setClickState(int value){
