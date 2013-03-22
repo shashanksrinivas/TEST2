@@ -22,7 +22,8 @@ import android.widget.Toast;
 public class DrawView extends View {
 	static ColorBall[] colorballs = new ColorBall[10]; // array that holds the
 														// balls
-
+	private boolean templateMode = true;// template mode does not use the
+										// recursive algorithm
 	Graph theGraph = new Graph();// initialize the graph
 	static int balID = 0; // variable to know what ball is being dragged
 	static int fromBalID = 0;
@@ -48,6 +49,10 @@ public class DrawView extends View {
 			R.drawable.ball_implies);
 	Bitmap alwaysBitmap = BitmapFactory.decodeResource(getResources(),
 			R.drawable.ball_always);
+	Bitmap untilBitmap = BitmapFactory.decodeResource(getResources(),
+			R.drawable.ball_until);
+	Bitmap templateBitmap = BitmapFactory.decodeResource(getResources(),
+			R.drawable.ball_template);
 	// private boolean secondDoubleTapOccurred = false;
 	Paint paint = new Paint();
 	GestureDetector gestureDetector;
@@ -101,7 +106,7 @@ public class DrawView extends View {
 		}
 		paint.setStrokeWidth(3);
 		canvas.drawLine(0, 0, 0, 800, paint);
-		paint.setColor(Color.YELLOW);
+		paint.setColor(Color.GRAY);
 		canvas.drawText("S", 25, 25, paint);
 		paint.setStyle(Paint.Style.FILL);
 		canvas.drawCircle(0, 0, 25, paint);
@@ -110,6 +115,37 @@ public class DrawView extends View {
 			if (MainActivity.waypoint[i] && isRoot(i + 1)) {
 				canvas.drawLine(0, 0, colorballs[i].getX() + 25,
 						colorballs[i].getY() + 25, paint);
+				if (colorballs[i].isEventually() || colorballs[i].isNext()
+						|| colorballs[i].isUntil() || colorballs[i].isAlways()) {
+					float deltaX = colorballs[i].getX() - 0;
+					float deltaY = colorballs[i].getY() - 0;
+					float frac = (float) 0.05;
+					float point_x_1 = 0 + (float) ((1 - frac) * deltaX * 0.8 + frac
+							* 0.5 * deltaY);
+					float point_y_1 = 0 + (float) ((1 - frac) * deltaY * 0.8 - frac
+							* 0.5 * deltaX);
+					float point_x_2 = colorballs[i].getX();
+					float point_y_2 = colorballs[i].getY();
+					float point_x_3 = 0 + (float) ((1 - frac) * deltaX * 0.8 - frac
+							* 0.5 * deltaY);
+					float point_y_3 = 0 + (float) ((1 - frac) * deltaY * 0.8 + frac
+							* 0.5 * deltaX);
+
+					mPath.moveTo((point_x_1) + 25, (point_y_1) + 25);
+					mPath.lineTo((point_x_2) + 25, (point_y_2) + 25);
+					mPath.lineTo((point_x_3) + 25, (point_y_3) + 25);
+					mPath.lineTo((point_x_1) + 25, (point_y_1) + 25);
+
+					paint.setStyle(Paint.Style.FILL);
+					canvas.drawPath(mPath, paint);
+					mPath.reset();
+				}
+
+				/*
+				 * if(colorballs[i].isAnd()){ canvas.drawBitmap( andBitmap,
+				 * (int) ((colorballs[i].getX() - 25) / 2 -25) / 2, (int)
+				 * ((colorballs[i] .getY() - 25) / 2 -25) / 2, paint); }
+				 */
 				if (colorballs[i].isAlwaysEventually()) {
 					if (colorballs[i].isAlways()) {
 						canvas.drawBitmap(alwaysBitmap,
@@ -155,30 +191,36 @@ public class DrawView extends View {
 					// for
 					// OR
 					paint.setColor(Color.CYAN);
+					paint.setPathEffect(new DashPathEffect(
+							new float[] { 10, 20 }, 0));
 					canvas.drawLine(colorballs[i].getX() + 25,
 							colorballs[i].getY() + 25,
 							colorballs[j].getX() + 25,
 							colorballs[j].getY() + 25, paint);
-					canvas.drawBitmap(orBitmap,
-							(colorballs[i].getX() + colorballs[j].getX()) / 2,
-							(colorballs[i].getY() + colorballs[j].getY()) / 2,
-							paint);
+					paint.setPathEffect(null);
+					/*
+					 * canvas.drawBitmap(orBitmap, (colorballs[i].getX() +
+					 * colorballs[j].getX()) / 2, (colorballs[i].getY() +
+					 * colorballs[j].getY()) / 2, paint);
+					 */
 					// bitmap for AND
-				} else if (!colorballs[i].isLineTo(j + 1)
-						&& MainActivity.waypoint[i] && MainActivity.waypoint[j]
-						&& isRoot(i + 1) && isRoot(j + 1)
-						&& !isLineToNonRootNode(j + 1)
-						&& !isLineToNonRootNode(i + 1)) {
-					paint.setColor(Color.MAGENTA);
-					canvas.drawLine(colorballs[i].getX() + 25,
-							colorballs[i].getY() + 25,
-							colorballs[j].getX() + 25,
-							colorballs[j].getY() + 25, paint);
-					canvas.drawBitmap(andBitmap,
-							(colorballs[i].getX() + colorballs[j].getX()) / 2,
-							(colorballs[i].getY() + colorballs[j].getY()) / 2,
-							paint);
 				}
+				/*
+				 * else if (!colorballs[i].isLineTo(j + 1) &&
+				 * MainActivity.waypoint[i] && MainActivity.waypoint[j] &&
+				 * isRoot(i + 1) && isRoot(j + 1) && !isLineToNonRootNode(j + 1)
+				 * && !isLineToNonRootNode(i + 1)) {
+				 * paint.setColor(Color.MAGENTA); paint.setPathEffect(null);
+				 * canvas.drawLine(colorballs[i].getX() + 25,
+				 * colorballs[i].getY() + 25, colorballs[j].getX() + 25,
+				 * colorballs[j].getY() + 25, paint);
+				 * 
+				 * canvas.drawBitmap(andBitmap, (colorballs[i].getX() +
+				 * colorballs[j].getX()) / 2, (colorballs[i].getY() +
+				 * colorballs[j].getY()) / 2, paint);
+				 * 
+				 * }
+				 */
 			}
 		}
 
@@ -200,34 +242,6 @@ public class DrawView extends View {
 							colorballs[j].getX() + 25,
 							colorballs[j].getY() + 25, paint);
 					paint.setPathEffect(null);
-					if (colorballs[j].isEventually()) {
-						canvas.drawBitmap(
-								eventuallyBitmap,
-								(colorballs[i].getX() + colorballs[j].getX()) / 2,
-								(colorballs[i].getY() + colorballs[j].getY()) / 2,
-								paint);
-					} else {
-						canvas.drawBitmap(
-								nextBitmap,
-								(colorballs[i].getX() + colorballs[j].getX()) / 2,
-								(colorballs[i].getY() + colorballs[j].getY()) / 2,
-								paint);
-					}
-					if (colorballs[j].isImplies()) {
-						canvas.drawBitmap(
-								impliesBitmap,
-								((colorballs[i].getX() + colorballs[j].getX()) / 2 + (colorballs[i]
-										.getX())) / 2,
-								((colorballs[i].getY() + colorballs[j].getY()) / 2 + (colorballs[i]
-										.getY())) / 2, paint);
-					} else {
-						canvas.drawBitmap(
-								andBitmap,
-								((colorballs[i].getX() + colorballs[j].getX()) / 2 + (colorballs[i]
-										.getX())) / 2,
-								((colorballs[i].getY() + colorballs[j].getY()) / 2 + (colorballs[i]
-										.getY())) / 2, paint);
-					}
 
 					float deltaX = colorballs[j].getX() - colorballs[i].getX();
 					float deltaY = colorballs[j].getY() - colorballs[i].getY();
@@ -256,6 +270,130 @@ public class DrawView extends View {
 					canvas.drawPath(mPath, paint);
 					mPath.reset();
 
+					if (colorballs[j].isAlwaysEventually()) {
+						if (colorballs[j].isEventually()) {
+							canvas.drawBitmap(eventuallyBitmap,
+									((colorballs[i].getX() + colorballs[j]
+											.getX()) / 2 + (colorballs[j]
+											.getX())) / 2,
+									((colorballs[i].getY() + colorballs[j]
+											.getY()) / 2 + (colorballs[j]
+											.getY())) / 2, paint);
+						} else {
+							if (colorballs[i].isNext() && !templateMode) {
+								canvas.drawBitmap(nextBitmap,
+										((colorballs[i].getX() + colorballs[j]
+												.getX()) / 2 + (colorballs[j]
+												.getX())) / 2,
+										((colorballs[i].getY() + colorballs[j]
+												.getY()) / 2 + (colorballs[j]
+												.getY())) / 2, paint);
+							}
+						}
+						if (colorballs[j].isAlways()) {
+							canvas.drawBitmap(alwaysBitmap, (colorballs[i]
+									.getX() + colorballs[j].getX()) / 2,
+									(colorballs[i].getY() + colorballs[j]
+											.getY()) / 2, paint);
+						}
+					} else {
+						if (colorballs[j].isEventually()) {
+							canvas.drawBitmap(eventuallyBitmap, (colorballs[i]
+									.getX() + colorballs[j].getX()) / 2,
+									(colorballs[i].getY() + colorballs[j]
+											.getY()) / 2, paint);
+						} else {
+							if (colorballs[i].isNext() && !templateMode) {
+								canvas.drawBitmap(nextBitmap, (colorballs[i]
+										.getX() + colorballs[j].getX()) / 2,
+										(colorballs[i].getY() + colorballs[j]
+												.getY()) / 2, paint);
+							}
+						}
+						if (colorballs[j].isAlways()) {
+							canvas.drawBitmap(alwaysBitmap,
+									((colorballs[i].getX() + colorballs[j]
+											.getX()) / 2 + (colorballs[j]
+											.getX())) / 2,
+									((colorballs[i].getY() + colorballs[j]
+											.getY()) / 2 + (colorballs[j]
+											.getY())) / 2, paint);
+						}
+					}
+
+					if (colorballs[j].isNext()) {
+						canvas.drawBitmap(
+								nextBitmap,
+								(colorballs[i].getX() + colorballs[j].getX()) / 2,
+								(colorballs[i].getY() + colorballs[j].getY()) / 2,
+								paint);
+						if (colorballs[j].isEventually()) {
+
+							canvas.drawBitmap(eventuallyBitmap,
+									((colorballs[i].getX() + colorballs[j]
+											.getX()) / 2 + (colorballs[j]
+											.getX())) / 2,
+									((colorballs[i].getY() + colorballs[j]
+											.getY()) / 2 + (colorballs[j]
+											.getY())) / 2, paint);
+
+						} else if (colorballs[j].isAlways()) {
+							canvas.drawBitmap(alwaysBitmap,
+									((colorballs[i].getX() + colorballs[j]
+											.getX()) / 2 + (colorballs[j]
+											.getX())) / 2,
+									((colorballs[i].getY() + colorballs[j]
+											.getY()) / 2 + (colorballs[j]
+											.getY())) / 2, paint);
+						}
+					}
+
+					if (colorballs[j].isUntil()) {
+						canvas.drawBitmap(
+								untilBitmap,
+								(colorballs[i].getX() + colorballs[j].getX()) / 2,
+								(colorballs[i].getY() + colorballs[j].getY()) / 2,
+								paint);
+						if (colorballs[j].isAlways()) {
+							canvas.drawBitmap(alwaysBitmap,
+									((colorballs[i].getX() + colorballs[j]
+											.getX()) / 2 + (colorballs[j]
+											.getX())) / 2,
+									((colorballs[i].getY() + colorballs[j]
+											.getY()) / 2 + (colorballs[j]
+											.getY())) / 2, paint);
+						}
+					}
+
+					if (colorballs[j].isImplies()) {
+						canvas.drawBitmap(
+								impliesBitmap,
+								((colorballs[i].getX() + colorballs[j].getX()) / 2 + (colorballs[i]
+										.getX())) / 2,
+								((colorballs[i].getY() + colorballs[j].getY()) / 2 + (colorballs[i]
+										.getY())) / 2, paint);
+						if (colorballs[j].isNext() && templateMode) {
+							canvas.drawBitmap(templateBitmap, (colorballs[i]
+									.getX() + colorballs[j].getX()) / 2,
+									(colorballs[i].getY() + colorballs[j]
+											.getY()) / 2, paint);
+						}
+					} else {
+						canvas.drawBitmap(
+								andBitmap,
+								((colorballs[i].getX() + colorballs[j].getX()) / 2 + (colorballs[i]
+										.getX())) / 2,
+								((colorballs[i].getY() + colorballs[j].getY()) / 2 + (colorballs[i]
+										.getY())) / 2, paint);
+						
+						if (colorballs[j].isNext() && templateMode) {
+							canvas.drawBitmap(templateBitmap, (colorballs[i]
+									.getX() + colorballs[j].getX()) / 2,
+									(colorballs[i].getY() + colorballs[j]
+											.getY()) / 2, paint);
+						}
+					}
+
 					/*
 					 * if(colorballs[j].isValid()) paint.setColor(Color.GREEN);
 					 * else paint.setColor(Color.RED);
@@ -279,7 +417,7 @@ public class DrawView extends View {
 				if (colorballs[i].getID() == 10) {
 					paint.setTextScaleX((float) 0.9);
 				}
-				canvas.drawText(String.valueOf(colorballs[i].getID()),
+				canvas.drawText(String.valueOf(colorballs[i].getLabel()),
 						colorballs[i].getX() + 15, colorballs[i].getY() + 30,
 						paint);
 			}

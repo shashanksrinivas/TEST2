@@ -11,6 +11,7 @@ public class ColorBall {
 	private int coordX = 0; // the x coordinate at the canvas
 	private int coordY = 0; // the y coordinate at the canvas
 	private int id; // gives every ball his own id, for now not necessary
+	private int label;//label of each node
 	private boolean enabled = false;
 	private static int count = 1;
 	private boolean goRight = true;
@@ -20,8 +21,12 @@ public class ColorBall {
 	private boolean valid = true;//whether you can or can't visit a location
 	private boolean always = false;//for visiting infinitely often
 	private boolean implies = false;
-	private boolean orMode = true;
+	private boolean and = true;
+	private boolean or = false;
+	private boolean orMode = false;
 	private boolean eventually = true;
+	private boolean next = false;
+	private boolean until = false;
 	private boolean alwaysEventually = true;
 	private boolean pickObject = false;
 	private boolean dropObject = false;
@@ -39,7 +44,7 @@ public class ColorBall {
 				drawable1);
 		imgInvalid = BitmapFactory.decodeResource(context.getResources(),
 				drawable2);
-		id = count;
+		id = label = count;
 		ltlString.concat(String.valueOf(id));
 		ltlString = "F(" + ltlString + ")";
 		count++;
@@ -107,7 +112,7 @@ public class ColorBall {
 				drawable1);
 		imgInvalid = BitmapFactory.decodeResource(context.getResources(),
 				drawable2);
-		id = count;
+		id = label = count;
 		// ltlString.concat(String.valueOf(id));
 		ltlString = String.valueOf(id);
 		setValid(isValid());
@@ -139,6 +144,13 @@ public class ColorBall {
 
 	public int getID() {
 		return id;
+	}
+	public int getLabel() {
+		return label;
+	}
+	
+	public void setLabel(int value){
+		label = value;
 	}
 
 	public Bitmap getBitmap() {
@@ -221,6 +233,51 @@ public class ColorBall {
 	
 	public boolean isEventually() {
 		return eventually;
+	}
+	
+	public boolean isNext() {
+		return next;
+	}
+	
+	public void setNext(boolean value){
+		next=value;
+	}
+	
+	public void toggleNext(){
+		next = !next;
+	}
+	
+	public boolean isUntil() {
+		return until;
+	}
+	
+	public void setUntil(boolean value){
+		until = value;
+	}
+	public void toggleUntil(){
+		until = !until;
+	}
+	
+	public boolean isAnd() {
+		return and;
+	}
+	
+	public void setAnd(boolean value){
+		and = value;
+	}
+	public void toggleAnd(){
+		and = !and;
+	}
+	
+	public boolean isOr() {
+		return or;
+	}
+	
+	public void setOr(boolean value){
+		or = value;
+	}
+	public void toggleOr(){
+		or = !or;
 	}
 	
 	public void toggleEventually(){

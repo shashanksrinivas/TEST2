@@ -6,6 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -29,6 +32,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -52,10 +56,8 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	static Bitmap scaledBitmap;
 	static Bitmap alteredBitmap;
 	RadioGroup robotGroup;
-	private int mCurrentMission=0;
-	
-	
-	
+	private int mCurrentMission = 0;
+
 	Canvas canvas;
 	Paint paint;
 	static Matrix matrix;
@@ -64,18 +66,21 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	public static int numWaypoints = 10;
 	static String finalLtlString;
 	String hyperFinalString;
-	
-	//action id
-		private static final int ID_LOC = 1;
-		private static final int ID_ALWAYS = 2;
-		private static final int ID_EVENTUALLY = 3;
-		private static final int ID_ORMODE = 4;
-		private static final int ID_PICKUP = 5;
-		private static final int ID_DROP = 6;	
-		private static final int ID_ACTSEN = 7;
-		private static final int ID_DEACTSEN = 8;
-		private static final int ID_IMPLIES = 9;
-		private static final int ID_ALWAYS_EVENTUALLY = 10;
+
+	// action id
+	private static final int ID_LOC = 1;
+	private static final int ID_ALWAYS = 2;
+	private static final int ID_EVENTUALLY = 3;
+	private static final int ID_ORMODE = 4;
+	private static final int ID_PICKUP = 5;
+	private static final int ID_DROP = 6;
+	private static final int ID_ACTSEN = 7;
+	private static final int ID_DEACTSEN = 8;
+	private static final int ID_IMPLIES = 9;
+	private static final int ID_ALWAYS_EVENTUALLY = 10;
+	private static final int ID_UNTIL = 11;
+	private static final int ID_NEXT = 12;
+	private static final int ID_LABEL = 13;
 
 	CheckBox wayPoint1;
 	CheckBox wayPoint2;
@@ -90,7 +95,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 
 	static boolean waypoint[] = new boolean[10];// keeps the status of waypoints
 												// (enabled/disabled)
-	
+
 	static LinkedList<ColorBall> currentColorBallList = new LinkedList<ColorBall>();
 	static LinkedList<LinkedList<ColorBall>> listOfColorBallLists = new LinkedList<LinkedList<ColorBall>>();
 
@@ -99,7 +104,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	private static final String appKey = "6j4m2i10o3v8o6a";
 	private static final String appSecret = "n7umsheli0ppuui";
 	private static final int REQUEST_LINK_TO_DBX = 0;
-	private String uploadFileName ="ltl_string_r1.txt";
+	private String uploadFileName = "ltl_string_r1.txt";
 
 	private TextView mTestOutput;
 	static TextView mCurrentLtlOutput;
@@ -110,146 +115,358 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	private Button mPreviewLtlButton;
 
 	static LinkedList<String> stringList = new LinkedList<String>();
+	AlertDialog.Builder alert;
+	
+/////////////////////////DIALOG
+	private static final String TAG = "DialogActivity";
+    private static final int DLG_EXAMPLE1 = 0;
+    private static final int TEXT_ID = 0;
+	/**
+     * Called to create a dialog to be shown.
+     */
+    @Override
+    protected Dialog onCreateDialog(int id) {
+ 
+        switch (id) {
+            case DLG_EXAMPLE1:
+                return createExampleDialog();
+            default:
+                return null;
+        }
+    }
+ 
+    /**
+     * If a dialog has already been created,
+     * this is called to reset the dialog
+     * before showing it a 2nd time. Optional.
+     */
+    @Override
+    protected void onPrepareDialog(int id, Dialog dialog) {
+ 
+        switch (id) {
+            case DLG_EXAMPLE1:
+                // Clear the input box.
+                EditText text = (EditText) dialog.findViewById(TEXT_ID);
+                text.setText("");
+                break;
+        }
+    }
+ 
+    /**
+     * Create and return an example alert dialog with an edit text box.
+     */
+    private Dialog createExampleDialog() {
+ 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("LABEL");
+        builder.setMessage("Type New Label");
+ 
+         // Use an EditText view to get user input.
+         final EditText input = new EditText(this);
+         input.setId(TEXT_ID);
+         builder.setView(input);
+ 
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+ 
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+            	int myNum = DrawView.colorballs[DrawView.balID - 1].getLabel();
+				// Do something with value!
+				try {
+					myNum = Integer.parseInt(input.getText().toString());
+				} catch (NumberFormatException nfe) {
+					System.out.println("Could not parse " + nfe);
+				}
+
+				DrawView.colorballs[DrawView.balID - 1].setLabel(myNum);
+                return;
+            }
+        });
+ 
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+ 
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                return;
+            }
+        });
+ 
+        return builder.create();
+    }
+
+	
+////////////////////////DIALOGEND
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		 requestWindowFeature(Window.FEATURE_NO_TITLE);
-	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
-	                                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-/////////////////////////////////////////////////////////////////////////////////////////
-////stuff related to quick action menu
-		ActionItem toggleLocItem 	= new ActionItem(ID_LOC, "VISIT / AVOID", getResources().getDrawable(R.drawable.toggle_loc));
-		ActionItem toggleAlwaysItem 	= new ActionItem(ID_ALWAYS, "ONCE / ALWAYS", getResources().getDrawable(R.drawable.toggle_always));
-        ActionItem toggleEventuallyItem 	= new ActionItem(ID_EVENTUALLY, "NEXT / LATER", getResources().getDrawable(R.drawable.toggle_eventually));
-        ActionItem toggleAlwaysEventuallyItem 	= new ActionItem(ID_ALWAYS_EVENTUALLY, "Always Eventually OR Eventually Always", getResources().getDrawable(R.drawable.toggle_eventually));
-        ActionItem toggleORModeItem = new ActionItem(ID_ORMODE, "OR NEXT(AND)/\nAND NEXT(LATER)", getResources().getDrawable(R.drawable.or_mode));
-        ActionItem pickupItem 	= new ActionItem(ID_PICKUP, "PICKUP OBJECT (TRUE/FALSE)", getResources().getDrawable(R.drawable.pickup_obj));
-        ActionItem dropItem 	= new ActionItem(ID_DROP, "DROP OBJECT (TRUE/FALSE)", getResources().getDrawable(R.drawable.drop_obj));
-        ActionItem actSenItem 		= new ActionItem(ID_ACTSEN, "ACTIVATE SENSOR (TRUE/FALSE)", getResources().getDrawable(R.drawable.activate_sensor));
-        ActionItem deactSenItem = new ActionItem(ID_DEACTSEN,"DEACTIVATE SENSOR (TRUE/FALSE)",getResources().getDrawable(R.drawable.deactivate_sensor));
-        ActionItem toggleImplies = new ActionItem(ID_IMPLIES, "TOGGLE IMPLIES (TRUE/FALSE)", getResources().getDrawable(R.drawable.toggle_implies));
-        //use setSticky(true) to disable QuickAction dialog being dismissed after an item is clicked
-        //prevItem.setSticky(true);
-        //nextItem.setSticky(true);
 		
-		//create QuickAction. Use QuickAction.VERTICAL or QuickAction.HORIZONTAL param to define layout 
-        //orientation
-		final QuickAction quickAction = new QuickAction(this, QuickAction.VERTICAL);
 		
-		//add action items into QuickAction
-        quickAction.addActionItem(toggleLocItem);
+
+		// ///////////////////////////////////////////////////////////////////////////////////////
+		// //stuff related to quick action menu
+		ActionItem toggleLocItem = new ActionItem(ID_LOC, "VISIT / AVOID",
+				getResources().getDrawable(R.drawable.toggle_loc));
+		ActionItem toggleAlwaysItem = new ActionItem(ID_ALWAYS,
+				"ONCE / ALWAYS", getResources().getDrawable(
+						R.drawable.toggle_always));
+		ActionItem toggleEventuallyItem = new ActionItem(ID_EVENTUALLY,
+				"TOGGLE FUTURE", getResources().getDrawable(
+						R.drawable.toggle_future));
+		ActionItem toggleUntilItem = new ActionItem(ID_UNTIL, "TOGGLE UNTIL",
+				getResources().getDrawable(R.drawable.toggle_until));
+		ActionItem toggleNextItem = new ActionItem(ID_NEXT, "TOGGLE NEXT",
+				getResources().getDrawable(R.drawable.toggle_next));
+		ActionItem toggleAlwaysEventuallyItem = new ActionItem(
+				ID_ALWAYS_EVENTUALLY, "Always Eventually OR Eventually Always",
+				getResources().getDrawable(R.drawable.toggle_eventually));
+		ActionItem toggleORModeItem = new ActionItem(ID_ORMODE,
+				"OR NEXT(AND)/\nAND NEXT(LATER)", getResources().getDrawable(
+						R.drawable.or_mode));
+		ActionItem pickupItem = new ActionItem(ID_PICKUP,
+				"PICKUP OBJECT (TRUE/FALSE)", getResources().getDrawable(
+						R.drawable.pickup_obj));
+		ActionItem dropItem = new ActionItem(ID_DROP,
+				"DROP OBJECT (TRUE/FALSE)", getResources().getDrawable(
+						R.drawable.drop_obj));
+		ActionItem actSenItem = new ActionItem(ID_ACTSEN,
+				"ACTIVATE SENSOR (TRUE/FALSE)", getResources().getDrawable(
+						R.drawable.activate_sensor));
+		ActionItem deactSenItem = new ActionItem(ID_DEACTSEN,
+				"DEACTIVATE SENSOR (TRUE/FALSE)", getResources().getDrawable(
+						R.drawable.deactivate_sensor));
+		ActionItem toggleImplies = new ActionItem(ID_IMPLIES,
+				"TOGGLE IMPLIES (TRUE/FALSE)", getResources().getDrawable(
+						R.drawable.toggle_implies));
+		ActionItem setLabel = new ActionItem(ID_LABEL, "SET LABEL",
+				getResources().getDrawable(R.drawable.set_label));
+		// use setSticky(true) to disable QuickAction dialog being dismissed
+		// after an item is clicked
+		// prevItem.setSticky(true);
+		// nextItem.setSticky(true);
+
+		// create QuickAction. Use QuickAction.VERTICAL or
+		// QuickAction.HORIZONTAL param to define layout
+		// orientation
+		final QuickAction quickAction = new QuickAction(this,
+				QuickAction.VERTICAL);
+
+		// add action items into QuickAction
+		quickAction.addActionItem(setLabel);
+		quickAction.addActionItem(toggleLocItem);
 		quickAction.addActionItem(toggleAlwaysItem);
 		quickAction.addActionItem(toggleAlwaysEventuallyItem);
 		quickAction.addActionItem(toggleImplies);
-        quickAction.addActionItem(toggleEventuallyItem);
-        quickAction.addActionItem(toggleORModeItem);
-        quickAction.addActionItem(pickupItem);
-        quickAction.addActionItem(dropItem);
-        quickAction.addActionItem(actSenItem);
-        quickAction.addActionItem(deactSenItem);
-        
-                
-        //Set listener for action item clicked
-		quickAction.setOnActionItemClickListener(new QuickAction.OnActionItemClickListener() {			
-			@Override
-			public void onItemClick(QuickAction source, int pos, int actionId) {				
-				ActionItem actionItem = quickAction.getActionItem(pos);
-                 
-				//here we can filter which action item was clicked with pos or actionId parameter
-				if (actionId == ID_LOC) {
-					if (DrawView.colorballs[DrawView.balID - 1].isValid()) {
-						DrawView.colorballs[DrawView.balID - 1].setValid(false);
-						Toast.makeText(getApplicationContext(), "AVOID SELECTED", Toast.LENGTH_SHORT).show();
-					} else {
-						DrawView.colorballs[DrawView.balID - 1].setValid(true);
-						Toast.makeText(getApplicationContext(), "VISIT SELECTED", Toast.LENGTH_SHORT).show();
-					}
-					
-				}else if (actionId == ID_ALWAYS) {
-					DrawView.colorballs[DrawView.balID - 1].toggleAlways();
-					if(DrawView.colorballs[DrawView.balID - 1].isAlways()){
-						Toast.makeText(getApplicationContext(), "ALWAYS SELECTED", Toast.LENGTH_SHORT).show();
-					}else{
-					Toast.makeText(getApplicationContext(), "ONCE SELECTED", Toast.LENGTH_SHORT).show();
-					}
-				}else if(actionId == ID_IMPLIES){
-					DrawView.colorballs[DrawView.balID - 1].toggleImplies();
-					if(DrawView.colorballs[DrawView.balID - 1].isImplies()){
-						Toast.makeText(getApplicationContext(), "IMPLIES SELECTED", Toast.LENGTH_SHORT).show();
-						}else{
-							Toast.makeText(getApplicationContext(), "IMPLIES DESELECTED", Toast.LENGTH_SHORT).show();
+		quickAction.addActionItem(toggleEventuallyItem);
+		quickAction.addActionItem(toggleUntilItem);
+		quickAction.addActionItem(toggleNextItem);
+		quickAction.addActionItem(toggleORModeItem);
+		quickAction.addActionItem(pickupItem);
+		quickAction.addActionItem(dropItem);
+		quickAction.addActionItem(actSenItem);
+		quickAction.addActionItem(deactSenItem);
+
+		// Set listener for action item clicked
+		quickAction
+				.setOnActionItemClickListener(new QuickAction.OnActionItemClickListener() {
+					@Override
+					public void onItemClick(QuickAction source, int pos,
+							int actionId) {
+						ActionItem actionItem = quickAction.getActionItem(pos);
+
+						// here we can filter which action item was clicked with
+						// pos or actionId parameter
+						if (actionId == ID_LOC) {
+							if (DrawView.colorballs[DrawView.balID - 1]
+									.isValid()) {
+								DrawView.colorballs[DrawView.balID - 1]
+										.setValid(false);
+								Toast.makeText(getApplicationContext(),
+										"AVOID SELECTED", Toast.LENGTH_SHORT)
+										.show();
+							} else {
+								DrawView.colorballs[DrawView.balID - 1]
+										.setValid(true);
+								Toast.makeText(getApplicationContext(),
+										"VISIT SELECTED", Toast.LENGTH_SHORT)
+										.show();
+							}
+
+						} else if (actionId == ID_ALWAYS) {
+							DrawView.colorballs[DrawView.balID - 1]
+									.toggleAlways();
+							if (DrawView.colorballs[DrawView.balID - 1]
+									.isAlways()) {
+								Toast.makeText(getApplicationContext(),
+										"ALWAYS SELECTED", Toast.LENGTH_SHORT)
+										.show();
+							} else {
+								Toast.makeText(getApplicationContext(),
+										"ONCE SELECTED", Toast.LENGTH_SHORT)
+										.show();
+							}
+						} else if (actionId == ID_LABEL) {
+							
+							
+							showDialog(DLG_EXAMPLE1);
+						} 
+						else if (actionId == ID_IMPLIES) {
+							DrawView.colorballs[DrawView.balID - 1]
+									.toggleImplies();
+							if (DrawView.colorballs[DrawView.balID - 1]
+									.isImplies()) {
+								Toast.makeText(getApplicationContext(),
+										"IMPLIES SELECTED", Toast.LENGTH_SHORT)
+										.show();
+							} else {
+								Toast.makeText(getApplicationContext(),
+										"IMPLIES DESELECTED",
+										Toast.LENGTH_SHORT).show();
+							}
+						} else if (actionId == ID_EVENTUALLY) {
+							DrawView.colorballs[DrawView.balID - 1]
+									.toggleEventually();
+							if (DrawView.colorballs[DrawView.balID - 1]
+									.isEventually()) {
+								Toast.makeText(getApplicationContext(),
+										"LATER SELECTED", Toast.LENGTH_SHORT)
+										.show();
+							} else {
+								Toast.makeText(getApplicationContext(),
+										"LATER REMOVED", Toast.LENGTH_SHORT)
+										.show();
+							}
+						} else if (actionId == ID_NEXT) {
+							DrawView.colorballs[DrawView.balID - 1]
+									.toggleNext();
+							if (DrawView.colorballs[DrawView.balID - 1]
+									.isNext()) {
+								Toast.makeText(getApplicationContext(),
+										"NEXT SELECTED", Toast.LENGTH_SHORT)
+										.show();
+							} else {
+								Toast.makeText(getApplicationContext(),
+										"NEXT REMOVED", Toast.LENGTH_SHORT)
+										.show();
+							}
+						} else if (actionId == ID_UNTIL) {
+							DrawView.colorballs[DrawView.balID - 1]
+									.toggleUntil();
+							if (DrawView.colorballs[DrawView.balID - 1]
+									.isUntil()) {
+								Toast.makeText(getApplicationContext(),
+										"UNTIL SELECTED", Toast.LENGTH_SHORT)
+										.show();
+							} else {
+								Toast.makeText(getApplicationContext(),
+										"UNTIL REMOVED", Toast.LENGTH_SHORT)
+										.show();
+							}
+						} else if (actionId == ID_ALWAYS_EVENTUALLY) {
+							DrawView.colorballs[DrawView.balID - 1]
+									.toggleAlwaysEventually();
+							if (DrawView.colorballs[DrawView.balID - 1]
+									.isAlwaysEventually()) {
+								Toast.makeText(getApplicationContext(),
+										"ALWAYS EVENTUALLY SELECTED",
+										Toast.LENGTH_SHORT).show();
+							} else {
+								Toast.makeText(getApplicationContext(),
+										"EVENTUALLY ALWAYS SELECTED",
+										Toast.LENGTH_SHORT).show();
+							}
+						} else if (actionId == ID_ORMODE) {
+							DrawView.colorballs[DrawView.balID - 1]
+									.toggleORMode();
+							if (DrawView.colorballs[DrawView.balID - 1]
+									.isORMode()) {
+								Toast.makeText(getApplicationContext(),
+										"IN OR MODE", Toast.LENGTH_SHORT)
+										.show();
+							} else {
+								Toast.makeText(getApplicationContext(),
+										"IN AND MODE", Toast.LENGTH_SHORT)
+										.show();
+							}
+						} else if (actionId == ID_PICKUP) {
+
+							DrawView.colorballs[DrawView.balID - 1]
+									.togglePickObject();
+							if (DrawView.colorballs[DrawView.balID - 1]
+									.isPickObject()) {
+								Toast.makeText(getApplicationContext(),
+										"PICK OBJECT TRUE", Toast.LENGTH_SHORT)
+										.show();
+							} else {
+								Toast.makeText(getApplicationContext(),
+										"PICK OBJECT FALSE", Toast.LENGTH_SHORT)
+										.show();
+							}
+						} else if (actionId == ID_DROP) {
+							DrawView.colorballs[DrawView.balID - 1]
+									.toggleDropObject();
+							if (DrawView.colorballs[DrawView.balID - 1]
+									.isDropObject()) {
+								Toast.makeText(getApplicationContext(),
+										"DROP OBJECT TRUE", Toast.LENGTH_SHORT)
+										.show();
+							} else {
+								Toast.makeText(getApplicationContext(),
+										"DROP OBJECT FALSE", Toast.LENGTH_SHORT)
+										.show();
+							}
+						} else if (actionId == ID_ACTSEN) {
+							DrawView.colorballs[DrawView.balID - 1]
+									.toggleActivateSensor();
+							if (DrawView.colorballs[DrawView.balID - 1]
+									.isActivateSensor()) {
+								Toast.makeText(getApplicationContext(),
+										"ACTIVATE SENSOR TRUE",
+										Toast.LENGTH_SHORT).show();
+							} else {
+								Toast.makeText(getApplicationContext(),
+										"ACTIVATE SENSOR FALSE",
+										Toast.LENGTH_SHORT).show();
+							}
+						} else if (actionId == ID_DEACTSEN) {
+							DrawView.colorballs[DrawView.balID - 1]
+									.toggleDeactivateSensor();
+							if (DrawView.colorballs[DrawView.balID - 1]
+									.isDeactivateSensor()) {
+								Toast.makeText(getApplicationContext(),
+										"DEACTIVATE SENSOR TRUE",
+										Toast.LENGTH_SHORT).show();
+							} else {
+								Toast.makeText(getApplicationContext(),
+										"DEACTIVATE SENSOR FALSE",
+										Toast.LENGTH_SHORT).show();
+							}
+						} else {
+							Toast.makeText(getApplicationContext(),
+									actionItem.getTitle() + " selected",
+									Toast.LENGTH_SHORT).show();
 						}
-				}else if (actionId == ID_EVENTUALLY) {
-					DrawView.colorballs[DrawView.balID - 1].toggleEventually();
-					if(DrawView.colorballs[DrawView.balID - 1].isEventually()){
-					Toast.makeText(getApplicationContext(), "LATER SELECTED", Toast.LENGTH_SHORT).show();
-					}else{
-						Toast.makeText(getApplicationContext(), "NEXT SELECTED", Toast.LENGTH_SHORT).show();
 					}
-				}else if (actionId == ID_ALWAYS_EVENTUALLY) {
-					DrawView.colorballs[DrawView.balID - 1].toggleAlwaysEventually();
-					if(DrawView.colorballs[DrawView.balID - 1].isAlwaysEventually()){
-					Toast.makeText(getApplicationContext(), "ALWAYS EVENTUALLY SELECTED", Toast.LENGTH_SHORT).show();
-					}else{
-						Toast.makeText(getApplicationContext(), "EVENTUALLY ALWAYS SELECTED", Toast.LENGTH_SHORT).show();
-					}
-				}else if(actionId == ID_ORMODE){
-					DrawView.colorballs[DrawView.balID - 1].toggleORMode();
-					if(DrawView.colorballs[DrawView.balID - 1].isORMode()){
-						Toast.makeText(getApplicationContext(), "IN OR MODE", Toast.LENGTH_SHORT).show();
-					}else{
-						Toast.makeText(getApplicationContext(), "IN AND MODE", Toast.LENGTH_SHORT).show();
-					}
-				}else if (actionId == ID_PICKUP) {
-				
-					DrawView.colorballs[DrawView.balID - 1].togglePickObject();
-					if(DrawView.colorballs[DrawView.balID - 1].isPickObject()){
-					Toast.makeText(getApplicationContext(), "PICK OBJECT TRUE", Toast.LENGTH_SHORT).show();
-					}else{
-						Toast.makeText(getApplicationContext(), "PICK OBJECT FALSE", Toast.LENGTH_SHORT).show();
-					}
-				}else if (actionId == ID_DROP) {
-					DrawView.colorballs[DrawView.balID - 1].toggleDropObject();
-					if(DrawView.colorballs[DrawView.balID - 1].isDropObject()){
-					Toast.makeText(getApplicationContext(), "DROP OBJECT TRUE", Toast.LENGTH_SHORT).show();
-					}else{
-						Toast.makeText(getApplicationContext(), "DROP OBJECT FALSE", Toast.LENGTH_SHORT).show();
-					}
-				}else if (actionId == ID_ACTSEN) {
-					DrawView.colorballs[DrawView.balID - 1].toggleActivateSensor();
-					if(DrawView.colorballs[DrawView.balID - 1].isActivateSensor()){
-					Toast.makeText(getApplicationContext(), "ACTIVATE SENSOR TRUE", Toast.LENGTH_SHORT).show();
-					}else{
-						Toast.makeText(getApplicationContext(), "ACTIVATE SENSOR FALSE", Toast.LENGTH_SHORT).show();
-					}
-				}else if (actionId == ID_DEACTSEN) {
-					DrawView.colorballs[DrawView.balID - 1].toggleDeactivateSensor();
-					if(DrawView.colorballs[DrawView.balID - 1].isDeactivateSensor()){
-					Toast.makeText(getApplicationContext(), "DEACTIVATE SENSOR TRUE", Toast.LENGTH_SHORT).show();
-					}else{
-						Toast.makeText(getApplicationContext(), "DEACTIVATE SENSOR FALSE", Toast.LENGTH_SHORT).show();
-					}
-				}else {
-					Toast.makeText(getApplicationContext(), actionItem.getTitle() + " selected", Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
-		
-		//set listnener for on dismiss event, this listener will be called only if QuickAction dialog was dismissed
-		//by clicking the area outside the dialog.
-		quickAction.setOnDismissListener(new QuickAction.OnDismissListener() {			
+				});
+
+		// set listnener for on dismiss event, this listener will be called only
+		// if QuickAction dialog was dismissed
+		// by clicking the area outside the dialog.
+		quickAction.setOnDismissListener(new QuickAction.OnDismissListener() {
 			@Override
 			public void onDismiss() {
-				Toast.makeText(getApplicationContext(), "NO OPTION SELECTED", Toast.LENGTH_LONG).show();
+				Toast.makeText(getApplicationContext(), "NO OPTION SELECTED",
+						Toast.LENGTH_LONG).show();
 			}
 		});
-////end of stuff related to quick action menu
-////////////////////////////////////////////////////////////////////////////////////////
-		
-		
+		// //end of stuff related to quick action menu
+		// //////////////////////////////////////////////////////////////////////////////////////
+
 		wayPoint1 = (CheckBox) findViewById(R.id.wayPoint1);
 		wayPoint2 = (CheckBox) findViewById(R.id.wayPoint2);
 		wayPoint3 = (CheckBox) findViewById(R.id.wayPoint3);
@@ -270,15 +487,18 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		wayPoint8.setOnCheckedChangeListener(this);
 		wayPoint9.setOnCheckedChangeListener(this);
 		wayPoint10.setOnCheckedChangeListener(this);
-		
+
 		dv = (DrawView) findViewById(R.id.draw_view);
 		registerForContextMenu(dv);
 		dv.setObserver(new QactionObserver() {
-			
+
 			@Override
 			public void callback() {
-				quickAction.show((Button) findViewById(R.id.selectMap));// TODO Auto-generated method stub
-				
+				quickAction.show((Button) findViewById(R.id.selectMap));// TODO
+																		// Auto-generated
+																		// method
+																		// stub
+
 			}
 		});
 
@@ -323,14 +543,14 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				if (!stringList.isEmpty())
-				{
-					stringList.removeLast();//remove string and associated colorball list
-					listOfColorBallLists.remove(listOfColorBallLists.size()-1);
-					
+				if (!stringList.isEmpty()) {
+					stringList.removeLast();// remove string and associated
+											// colorball list
+					listOfColorBallLists.remove(listOfColorBallLists.size() - 1);
+
 				}
 				mTestOutput.setText("");
-				for(String s: stringList){
+				for (String s : stringList) {
 					mTestOutput.append("¥ " + s + "\n");
 				}
 
@@ -345,31 +565,35 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 				// TODO Auto-generated method stub
 				stringList.add(finalLtlString);
 				mTestOutput.setText("");
-				for(String s: stringList){
+				for (String s : stringList) {
 					mTestOutput.append("¥ " + s + "\n");
 				}
 				currentColorBallList.clear();
-				for(int i=0;i<10;i++){
-					if(true){//create colorball list 
-						ColorBall tempBall = new ColorBall(DrawView.colorballs[i]);
-					currentColorBallList.add(tempBall);
+				for (int i = 0; i < 10; i++) {
+					if (true) {// create colorball list
+						ColorBall tempBall = new ColorBall(
+								DrawView.colorballs[i]);
+						currentColorBallList.add(tempBall);
 					}
 				}
-				listOfColorBallLists.add(currentColorBallList);//add colorball list to list of colorball lists
+				listOfColorBallLists.add(currentColorBallList);// add colorball
+																// list to list
+																// of colorball
+																// lists
 				mCurrentMission = listOfColorBallLists.size();
-				//debug
-				for(int i=0;i<mCurrentMission;i++){
-				ColorBall temp = listOfColorBallLists.get(i).get(0);
-				int y=0;
+				// debug
+				for (int i = 0; i < mCurrentMission; i++) {
+					ColorBall temp = listOfColorBallLists.get(i).get(0);
+					int y = 0;
 				}
 
 			}
 		});
-		
+
 		mPreviewLtlButton = (Button) findViewById(R.id.previewLtlButton);
 		registerForContextMenu(mPreviewLtlButton);
 		mPreviewLtlButton.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
@@ -378,24 +602,21 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		});
 
 	}
-	
-	
-	 
-	
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		
-		int index=0;
-		for(String s: stringList){
-			if(item.getTitle() == s){
+
+		int index = 0;
+		for (String s : stringList) {
+			if (item.getTitle() == s) {
 				mCurrentMission = index;
-				
-				LinkedList<ColorBall> tempList = listOfColorBallLists.get(index) ;
-				//debug
-				
-				for(int i=0;i<10;i++){
-					//if(waypoint[i])
+
+				LinkedList<ColorBall> tempList = listOfColorBallLists
+						.get(index);
+				// debug
+
+				for (int i = 0; i < 10; i++) {
+					// if(waypoint[i])
 					DrawView.colorballs[i].copy(tempList.get(i));
 					int x = tempList.get(0).getX();
 					int y = tempList.get(0).getY();
@@ -434,7 +655,8 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 						.decodeStream(
 								getContentResolver().openInputStream(
 										imageFileUri), null, bmpFactoryOptions);
-				scaledBitmap = Bitmap.createScaledBitmap(bmp, dv.getWidth(), dv.getHeight(), true);
+				scaledBitmap = Bitmap.createScaledBitmap(bmp, dv.getWidth(),
+						dv.getHeight(), true);
 				alteredBitmap = Bitmap.createBitmap(bmp.getWidth(),
 						bmp.getHeight(), bmp.getConfig());
 				canvas = new Canvas(alteredBitmap);
@@ -512,7 +734,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		super.onResume();
 		if (mDbxAcctMgr.hasLinkedAccount()) {
 			showLinkedView();
-			//doDropboxTest();
+			// doDropboxTest();
 		} else {
 			showUnlinkedView();
 		}
@@ -618,19 +840,19 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 				}
 			}
 			hyperFinalString = hyperFinalString.replace("F", "<>");
-			hyperFinalString = hyperFinalString.replace("G","[]");
+			hyperFinalString = hyperFinalString.replace("G", "[]");
 			hyperFinalString = hyperFinalString.replace("NOT", "!");
 			mTestOutput.setText(hyperFinalString);
 			String length = "" + hyperFinalString.length();
 			final String TEST_DATA = length + "\n" + hyperFinalString;
 
-			final String TEST_FILE_NAME = uploadFileName;//"ltl_string.txt";
+			final String TEST_FILE_NAME = uploadFileName;// "ltl_string.txt";
 			DbxPath testPath = new DbxPath(DbxPath.ROOT, TEST_FILE_NAME);
 
 			// Create DbxFileSystem for synchronized file access.
 			DbxFileSystem dbxFs = DbxFileSystem.forAccount(mDbxAcctMgr
 					.getLinkedAccount());
-			
+
 			if (!dbxFs.exists(testPath)) {
 				DbxFile testFile = dbxFs.create(testPath);
 				testFile.close();
@@ -653,45 +875,38 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		} catch (IOException e) {
 			mTestOutput.setText("Dropbox test failed: " + e);
 		}
-		
-		
 
 	}
+
 	public void onRadioButtonClicked(View view) {
-	    // Is the button now checked?
-	    boolean checked = ((RadioButton) view).isChecked();
-	    
-	    // Check which radio button was clicked
-	    switch(view.getId()) {
-	        case R.id.robot1:
-	            if (checked)
-	            	uploadFileName = "ltl_string_r1.txt";
-	                // Pirates are the best
-	            break;
-	        case R.id.robot2:
-	            if (checked)
-	            	uploadFileName = "ltl_string_r2.txt";
-	                // Ninjas rule
-	            break;
-	    }
+		// Is the button now checked?
+		boolean checked = ((RadioButton) view).isChecked();
+
+		// Check which radio button was clicked
+		switch (view.getId()) {
+		case R.id.robot1:
+			if (checked)
+				uploadFileName = "ltl_string_r1.txt";
+			// Pirates are the best
+			break;
+		case R.id.robot2:
+			if (checked)
+				uploadFileName = "ltl_string_r2.txt";
+			// Ninjas rule
+			break;
+		}
 	}
-
-
-
-
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
 		// TODO Auto-generated method stub
-		//menu.add("hello");
+		// menu.add("hello");
 		super.onCreateContextMenu(menu, v, menuInfo);
-		
-		for(String s: stringList){
+
+		for (String s : stringList) {
 			menu.add(s);
 		}
 	}
-	
-	
 
 }
