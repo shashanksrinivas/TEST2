@@ -112,7 +112,7 @@ public class DrawView extends View {
 		canvas.drawCircle(0, 0, 25, paint);
 
 		for (int i = 0; i < 10; i++) {
-			if (MainActivity.waypoint[i] && isRoot(i + 1)) {
+			if (MainActivity.waypoint[i] && isRoot(i + 1) && isLeastInCompletelyConnected(i)) {
 				canvas.drawLine(0, 0, colorballs[i].getX() + 25,
 						colorballs[i].getY() + 25, paint);
 				if (colorballs[i].isEventually() || colorballs[i].isNext()
@@ -366,19 +366,21 @@ public class DrawView extends View {
 					}
 
 					if (colorballs[j].isImplies()) {
+						if(!colorballs[j].isUntil())//until stands alone and cannot have boolean operators preceding it
 						canvas.drawBitmap(
 								impliesBitmap,
 								((colorballs[i].getX() + colorballs[j].getX()) / 2 + (colorballs[i]
 										.getX())) / 2,
 								((colorballs[i].getY() + colorballs[j].getY()) / 2 + (colorballs[i]
 										.getY())) / 2, paint);
-						if (colorballs[j].isNext() && templateMode) {
+						if (colorballs[j].isNext() && templateMode && colorballs[j].isValid() && colorballs[i].isValid()) {
 							canvas.drawBitmap(templateBitmap, (colorballs[i]
 									.getX() + colorballs[j].getX()) / 2,
 									(colorballs[i].getY() + colorballs[j]
 											.getY()) / 2, paint);
 						}
 					} else {
+						if(!colorballs[j].isUntil())
 						canvas.drawBitmap(
 								andBitmap,
 								((colorballs[i].getX() + colorballs[j].getX()) / 2 + (colorballs[i]
@@ -386,7 +388,7 @@ public class DrawView extends View {
 								((colorballs[i].getY() + colorballs[j].getY()) / 2 + (colorballs[i]
 										.getY())) / 2, paint);
 						
-						if (colorballs[j].isNext() && templateMode) {
+						if (colorballs[j].isNext() && templateMode && colorballs[j].isValid() && colorballs[i].isValid()) {
 							canvas.drawBitmap(templateBitmap, (colorballs[i]
 									.getX() + colorballs[j].getX()) / 2,
 									(colorballs[i].getY() + colorballs[j]
@@ -764,6 +766,17 @@ public class DrawView extends View {
 		}
 		return false;
 
+	}
+	
+	public boolean isLeastInCompletelyConnected(int index){
+		
+		for(int i=0;i<10;i++){
+			if(isCompletelyConnected(i) && colorballs[i].isLineTo(index+1)){
+				if(i<index)
+					return false;
+			}
+		}
+		return true;
 	}
 
 	public boolean isRoot(int balID) {

@@ -224,7 +224,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 				getResources().getDrawable(R.drawable.toggle_next));
 		ActionItem toggleAlwaysEventuallyItem = new ActionItem(
 				ID_ALWAYS_EVENTUALLY, "Always Eventually OR Eventually Always",
-				getResources().getDrawable(R.drawable.toggle_eventually));
+				getResources().getDrawable(R.drawable.toggle_always_eventually));
 		ActionItem toggleORModeItem = new ActionItem(ID_ORMODE,
 				"OR NEXT(AND)/\nAND NEXT(LATER)", getResources().getDrawable(
 						R.drawable.or_mode));

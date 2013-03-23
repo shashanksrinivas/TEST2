@@ -69,14 +69,15 @@ public final class R {
         public static final int remove=0x7f020022;
         public static final int set_label=0x7f020023;
         public static final int toggle_always=0x7f020024;
-        public static final int toggle_eventually=0x7f020025;
-        public static final int toggle_future=0x7f020026;
-        public static final int toggle_implies=0x7f020027;
-        public static final int toggle_implies2=0x7f020028;
-        public static final int toggle_loc=0x7f020029;
-        public static final int toggle_next=0x7f02002a;
-        public static final int toggle_until=0x7f02002b;
-        public static final int upload=0x7f02002c;
+        public static final int toggle_always_eventually=0x7f020025;
+        public static final int toggle_eventually=0x7f020026;
+        public static final int toggle_future=0x7f020027;
+        public static final int toggle_implies=0x7f020028;
+        public static final int toggle_implies2=0x7f020029;
+        public static final int toggle_loc=0x7f02002a;
+        public static final int toggle_next=0x7f02002b;
+        public static final int toggle_until=0x7f02002c;
+        public static final int upload=0x7f02002d;
     }
     public static final class id {
         public static final int addMission=0x7f090003;
