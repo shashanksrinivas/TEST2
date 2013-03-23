@@ -141,7 +141,7 @@
             android:layout_height="match_parent"
             android:text="hello" />
 
-        <com.CPS.test2.DrawView
+        <com.CPS.LTLvis.DrawView
             android:id="@+id/draw_view"
             android:layout_width="950dp"
             android:layout_height="match_parent" />
