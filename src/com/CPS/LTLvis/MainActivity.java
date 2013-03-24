@@ -67,18 +67,11 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 
 	// action id
 	private static final int ID_LOC = 1;
-	private static final int ID_ALWAYS = 2;
-	private static final int ID_EVENTUALLY = 3;
-	private static final int ID_ORMODE = 4;
-	private static final int ID_PICKUP = 5;
-	private static final int ID_DROP = 6;
-	private static final int ID_ACTSEN = 7;
-	private static final int ID_DEACTSEN = 8;
-	private static final int ID_IMPLIES = 9;
-	private static final int ID_ALWAYS_EVENTUALLY = 10;
-	private static final int ID_UNTIL = 11;
-	private static final int ID_NEXT = 12;
-	private static final int ID_LABEL = 13;
+	private static final int ID_B1STATE = 2;
+	private static final int ID_B2STATE = 3;
+	private static final int ID_T1STATE = 4;
+	private static final int ID_T2STATE = 5;
+	private static final int ID_LABEL = 6;
 
 	CheckBox wayPoint1;
 	CheckBox wayPoint2;
@@ -114,61 +107,61 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 
 	static LinkedList<String> stringList = new LinkedList<String>();
 	AlertDialog.Builder alert;
-	
-/////////////////////////DIALOG
+
+	// ///////////////////////DIALOG
 	private static final String TAG = "DialogActivity";
-    private static final int DLG_EXAMPLE1 = 0;
-    private static final int TEXT_ID = 0;
+	private static final int DLG_EXAMPLE1 = 0;
+	private static final int TEXT_ID = 0;
+
 	/**
-     * Called to create a dialog to be shown.
-     */
-    @Override
-    protected Dialog onCreateDialog(int id) {
- 
-        switch (id) {
-            case DLG_EXAMPLE1:
-                return createExampleDialog();
-            default:
-                return null;
-        }
-    }
- 
-    /**
-     * If a dialog has already been created,
-     * this is called to reset the dialog
-     * before showing it a 2nd time. Optional.
-     */
-    @Override
-    protected void onPrepareDialog(int id, Dialog dialog) {
- 
-        switch (id) {
-            case DLG_EXAMPLE1:
-                // Clear the input box.
-                EditText text = (EditText) dialog.findViewById(TEXT_ID);
-                text.setText("");
-                break;
-        }
-    }
- 
-    /**
-     * Create and return an example alert dialog with an edit text box.
-     */
-    private Dialog createExampleDialog() {
- 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("LABEL");
-        builder.setMessage("Type New Label");
- 
-         // Use an EditText view to get user input.
-         final EditText input = new EditText(this);
-         input.setId(TEXT_ID);
-         builder.setView(input);
- 
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
- 
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-            	int myNum = DrawView.colorballs[DrawView.balID - 1].getLabel();
+	 * Called to create a dialog to be shown.
+	 */
+	@Override
+	protected Dialog onCreateDialog(int id) {
+
+		switch (id) {
+		case DLG_EXAMPLE1:
+			return createExampleDialog();
+		default:
+			return null;
+		}
+	}
+
+	/**
+	 * If a dialog has already been created, this is called to reset the dialog
+	 * before showing it a 2nd time. Optional.
+	 */
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog) {
+
+		switch (id) {
+		case DLG_EXAMPLE1:
+			// Clear the input box.
+			EditText text = (EditText) dialog.findViewById(TEXT_ID);
+			text.setText("");
+			break;
+		}
+	}
+
+	/**
+	 * Create and return an example alert dialog with an edit text box.
+	 */
+	private Dialog createExampleDialog() {
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("LABEL");
+		builder.setMessage("Type New Label");
+
+		// Use an EditText view to get user input.
+		final EditText input = new EditText(this);
+		input.setId(TEXT_ID);
+		builder.setView(input);
+
+		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+				int myNum = DrawView.colorballs[DrawView.balID - 1].getLabel();
 				// Do something with value!
 				try {
 					myNum = Integer.parseInt(input.getText().toString());
@@ -177,23 +170,23 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 				}
 
 				DrawView.colorballs[DrawView.balID - 1].setLabel(myNum);
-                return;
-            }
-        });
- 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
- 
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                return;
-            }
-        });
- 
-        return builder.create();
-    }
+				return;
+			}
+		});
 
-	
-////////////////////////DIALOGEND
+		builder.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						return;
+					}
+				});
+
+		return builder.create();
+	}
+
+	// //////////////////////DIALOGEND
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -203,44 +196,20 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		
 
 		// ///////////////////////////////////////////////////////////////////////////////////////
 		// //stuff related to quick action menu
 		ActionItem toggleLocItem = new ActionItem(ID_LOC, "VISIT / AVOID",
 				getResources().getDrawable(R.drawable.toggle_loc));
-		ActionItem toggleAlwaysItem = new ActionItem(ID_ALWAYS,
-				"ONCE / ALWAYS", getResources().getDrawable(
-						R.drawable.toggle_always));
-		ActionItem toggleEventuallyItem = new ActionItem(ID_EVENTUALLY,
-				"TOGGLE FUTURE", getResources().getDrawable(
-						R.drawable.toggle_future));
-		ActionItem toggleUntilItem = new ActionItem(ID_UNTIL, "TOGGLE UNTIL",
+		ActionItem changeB1State = new ActionItem(ID_B1STATE, "CHANGE B1",
+				getResources().getDrawable(R.drawable.toggle_always));
+		ActionItem changeB2State = new ActionItem(ID_B2STATE, "CHANGE B2",
+				getResources().getDrawable(R.drawable.toggle_future));
+		ActionItem changeT1State = new ActionItem(ID_T1STATE, "CHANGE T1",
 				getResources().getDrawable(R.drawable.toggle_until));
-		ActionItem toggleNextItem = new ActionItem(ID_NEXT, "TOGGLE NEXT",
+		ActionItem changeT2State = new ActionItem(ID_T2STATE, "CHANGE T2",
 				getResources().getDrawable(R.drawable.toggle_next));
-		ActionItem toggleAlwaysEventuallyItem = new ActionItem(
-				ID_ALWAYS_EVENTUALLY, "Always Eventually OR Eventually Always",
-				getResources().getDrawable(R.drawable.toggle_always_eventually));
-		ActionItem toggleORModeItem = new ActionItem(ID_ORMODE,
-				"OR NEXT(AND)/\nAND NEXT(LATER)", getResources().getDrawable(
-						R.drawable.or_mode));
-		ActionItem pickupItem = new ActionItem(ID_PICKUP,
-				"PICKUP OBJECT (TRUE/FALSE)", getResources().getDrawable(
-						R.drawable.pickup_obj));
-		ActionItem dropItem = new ActionItem(ID_DROP,
-				"DROP OBJECT (TRUE/FALSE)", getResources().getDrawable(
-						R.drawable.drop_obj));
-		ActionItem actSenItem = new ActionItem(ID_ACTSEN,
-				"ACTIVATE SENSOR (TRUE/FALSE)", getResources().getDrawable(
-						R.drawable.activate_sensor));
-		ActionItem deactSenItem = new ActionItem(ID_DEACTSEN,
-				"DEACTIVATE SENSOR (TRUE/FALSE)", getResources().getDrawable(
-						R.drawable.deactivate_sensor));
-		ActionItem toggleImplies = new ActionItem(ID_IMPLIES,
-				"TOGGLE IMPLIES (TRUE/FALSE)", getResources().getDrawable(
-						R.drawable.toggle_implies));
+
 		ActionItem setLabel = new ActionItem(ID_LABEL, "SET LABEL",
 				getResources().getDrawable(R.drawable.set_label));
 		// use setSticky(true) to disable QuickAction dialog being dismissed
@@ -257,17 +226,10 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		// add action items into QuickAction
 		quickAction.addActionItem(setLabel);
 		quickAction.addActionItem(toggleLocItem);
-		quickAction.addActionItem(toggleAlwaysItem);
-		quickAction.addActionItem(toggleAlwaysEventuallyItem);
-		quickAction.addActionItem(toggleImplies);
-		quickAction.addActionItem(toggleEventuallyItem);
-		quickAction.addActionItem(toggleUntilItem);
-		quickAction.addActionItem(toggleNextItem);
-		quickAction.addActionItem(toggleORModeItem);
-		quickAction.addActionItem(pickupItem);
-		quickAction.addActionItem(dropItem);
-		quickAction.addActionItem(actSenItem);
-		quickAction.addActionItem(deactSenItem);
+		quickAction.addActionItem(changeB1State);
+		quickAction.addActionItem(changeB2State);
+		quickAction.addActionItem(changeT1State);
+		quickAction.addActionItem(changeT2State);
 
 		// Set listener for action item clicked
 		quickAction
@@ -295,160 +257,41 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 										.show();
 							}
 
-						} else if (actionId == ID_ALWAYS) {
+						} else if (actionId == ID_B1STATE) {
 							DrawView.colorballs[DrawView.balID - 1]
-									.toggleAlways();
-							if (DrawView.colorballs[DrawView.balID - 1]
-									.isAlways()) {
-								Toast.makeText(getApplicationContext(),
-										"ALWAYS SELECTED", Toast.LENGTH_SHORT)
-										.show();
-							} else {
-								Toast.makeText(getApplicationContext(),
-										"ONCE SELECTED", Toast.LENGTH_SHORT)
-										.show();
-							}
-						} else if (actionId == ID_LABEL) {
-							
-							
-							showDialog(DLG_EXAMPLE1);
-						} 
-						else if (actionId == ID_IMPLIES) {
-							DrawView.colorballs[DrawView.balID - 1]
-									.toggleImplies();
-							if (DrawView.colorballs[DrawView.balID - 1]
-									.isImplies()) {
-								Toast.makeText(getApplicationContext(),
-										"IMPLIES SELECTED", Toast.LENGTH_SHORT)
-										.show();
-							} else {
-								Toast.makeText(getApplicationContext(),
-										"IMPLIES DESELECTED",
-										Toast.LENGTH_SHORT).show();
-							}
-						} else if (actionId == ID_EVENTUALLY) {
-							DrawView.colorballs[DrawView.balID - 1]
-									.toggleEventually();
-							if (DrawView.colorballs[DrawView.balID - 1]
-									.isEventually()) {
-								Toast.makeText(getApplicationContext(),
-										"LATER SELECTED", Toast.LENGTH_SHORT)
-										.show();
-							} else {
-								Toast.makeText(getApplicationContext(),
-										"LATER REMOVED", Toast.LENGTH_SHORT)
-										.show();
-							}
-						} else if (actionId == ID_NEXT) {
-							DrawView.colorballs[DrawView.balID - 1]
-									.toggleNext();
-							if (DrawView.colorballs[DrawView.balID - 1]
-									.isNext()) {
-								Toast.makeText(getApplicationContext(),
-										"NEXT SELECTED", Toast.LENGTH_SHORT)
-										.show();
-							} else {
-								Toast.makeText(getApplicationContext(),
-										"NEXT REMOVED", Toast.LENGTH_SHORT)
-										.show();
-							}
-						} else if (actionId == ID_UNTIL) {
-							DrawView.colorballs[DrawView.balID - 1]
-									.toggleUntil();
-							if (DrawView.colorballs[DrawView.balID - 1]
-									.isUntil()) {
-								Toast.makeText(getApplicationContext(),
-										"UNTIL SELECTED", Toast.LENGTH_SHORT)
-										.show();
-							} else {
-								Toast.makeText(getApplicationContext(),
-										"UNTIL REMOVED", Toast.LENGTH_SHORT)
-										.show();
-							}
-						} else if (actionId == ID_ALWAYS_EVENTUALLY) {
-							DrawView.colorballs[DrawView.balID - 1]
-									.toggleAlwaysEventually();
-							if (DrawView.colorballs[DrawView.balID - 1]
-									.isAlwaysEventually()) {
-								Toast.makeText(getApplicationContext(),
-										"ALWAYS EVENTUALLY SELECTED",
-										Toast.LENGTH_SHORT).show();
-							} else {
-								Toast.makeText(getApplicationContext(),
-										"EVENTUALLY ALWAYS SELECTED",
-										Toast.LENGTH_SHORT).show();
-							}
-						} else if (actionId == ID_ORMODE) {
-							DrawView.colorballs[DrawView.balID - 1]
-									.toggleORMode();
-							if (DrawView.colorballs[DrawView.balID - 1]
-									.isORMode()) {
-								Toast.makeText(getApplicationContext(),
-										"IN OR MODE", Toast.LENGTH_SHORT)
-										.show();
-							} else {
-								Toast.makeText(getApplicationContext(),
-										"IN AND MODE", Toast.LENGTH_SHORT)
-										.show();
-							}
-						} else if (actionId == ID_PICKUP) {
+									.toggleB1State();
 
+						} else if (actionId == ID_LABEL) {
+							showDialog(DLG_EXAMPLE1);
+
+						} else if (actionId == ID_B2STATE) {
 							DrawView.colorballs[DrawView.balID - 1]
-									.togglePickObject();
-							if (DrawView.colorballs[DrawView.balID - 1]
-									.isPickObject()) {
-								Toast.makeText(getApplicationContext(),
-										"PICK OBJECT TRUE", Toast.LENGTH_SHORT)
-										.show();
-							} else {
-								Toast.makeText(getApplicationContext(),
-										"PICK OBJECT FALSE", Toast.LENGTH_SHORT)
-										.show();
-							}
-						} else if (actionId == ID_DROP) {
+									.setOperators(
+											DrawView.colorballs[DrawView.balID - 1]
+													.getNextB2State(),
+											DrawView.colorballs[DrawView.balID - 1]
+													.getT1State(),
+											DrawView.colorballs[DrawView.balID - 1]
+													.getT2State());
+						} else if (actionId == ID_T1STATE) {
 							DrawView.colorballs[DrawView.balID - 1]
-									.toggleDropObject();
-							if (DrawView.colorballs[DrawView.balID - 1]
-									.isDropObject()) {
-								Toast.makeText(getApplicationContext(),
-										"DROP OBJECT TRUE", Toast.LENGTH_SHORT)
-										.show();
-							} else {
-								Toast.makeText(getApplicationContext(),
-										"DROP OBJECT FALSE", Toast.LENGTH_SHORT)
-										.show();
-							}
-						} else if (actionId == ID_ACTSEN) {
+									.setOperators(
+											DrawView.colorballs[DrawView.balID - 1]
+													.getB2State(),
+											DrawView.colorballs[DrawView.balID - 1]
+													.getNextT1State(),
+											DrawView.colorballs[DrawView.balID - 1]
+													.getT2State());
+						} else if (actionId == ID_T2STATE) {
 							DrawView.colorballs[DrawView.balID - 1]
-									.toggleActivateSensor();
-							if (DrawView.colorballs[DrawView.balID - 1]
-									.isActivateSensor()) {
-								Toast.makeText(getApplicationContext(),
-										"ACTIVATE SENSOR TRUE",
-										Toast.LENGTH_SHORT).show();
-							} else {
-								Toast.makeText(getApplicationContext(),
-										"ACTIVATE SENSOR FALSE",
-										Toast.LENGTH_SHORT).show();
-							}
-						} else if (actionId == ID_DEACTSEN) {
-							DrawView.colorballs[DrawView.balID - 1]
-									.toggleDeactivateSensor();
-							if (DrawView.colorballs[DrawView.balID - 1]
-									.isDeactivateSensor()) {
-								Toast.makeText(getApplicationContext(),
-										"DEACTIVATE SENSOR TRUE",
-										Toast.LENGTH_SHORT).show();
-							} else {
-								Toast.makeText(getApplicationContext(),
-										"DEACTIVATE SENSOR FALSE",
-										Toast.LENGTH_SHORT).show();
-							}
-						} else {
-							Toast.makeText(getApplicationContext(),
-									actionItem.getTitle() + " selected",
-									Toast.LENGTH_SHORT).show();
-						}
+									.setOperators(
+											DrawView.colorballs[DrawView.balID - 1]
+													.getB2State(),
+											DrawView.colorballs[DrawView.balID - 1]
+													.getT1State(),
+											DrawView.colorballs[DrawView.balID - 1]
+													.getNextT2State());
+						} 
 					}
 				});
 
@@ -485,6 +328,8 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		wayPoint8.setOnCheckedChangeListener(this);
 		wayPoint9.setOnCheckedChangeListener(this);
 		wayPoint10.setOnCheckedChangeListener(this);
+		wayPoint1.setChecked(true);
+		wayPoint1.setClickable(false);
 
 		dv = (DrawView) findViewById(R.id.draw_view);
 		registerForContextMenu(dv);

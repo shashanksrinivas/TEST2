@@ -98,7 +98,16 @@ class Graph {
 		adjMat[start][end] = !adjMat[start][end];
 		// adjMat[end][start] = 1;
 	}
+	
+	public void setEdge(int start, int end) {
+		
+		adjMat[start][end] = true;
+	}
 
+public void unsetEdge(int start, int end) {
+		
+		adjMat[start][end] = false;
+	}
 	// ------------------------------------------------------------
 	public void displayVertex(int v) {
 		System.out.print(vertexList[v].label);
@@ -254,6 +263,7 @@ class Graph {
 				}
 			}
 		}
+		if(MainActivity.waypoint[balID-1])
 		theStack.push(balID); // push it
 		int mostRecentPop = -1;
 
@@ -262,6 +272,8 @@ class Graph {
 
 			// get an unvisited vertex adjacent to stack top
 			int v = getAdjUnvisitedVertex(theStack.peek());
+			if(v!=-1 && MainActivity.waypoint[v-1]==false)
+				v=-1;
 			if (v == -1) {// if no such vertex,
 				// if(!(mainString=="")){
 				// mainString = mainString + " && " + ltlString;
@@ -498,7 +510,7 @@ class Graph {
 
 					}
 				} else {
-					if (!DrawView.colorballs[theStack.peek() - 1].isORMode()) {
+					if (!(DrawView.colorballs[theStack.peek() - 1].getB1State()==b1.OR)) {
 						ltlString = splitStrings[0] + ") && (" + tempString
 								+ splitStrings[1];
 					} else {

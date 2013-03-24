@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 
+
+
 public class ColorBall {
 	private Bitmap imgValid; // the image of the ball
 	private Bitmap imgInvalid;
@@ -21,9 +23,26 @@ public class ColorBall {
 	private boolean valid = true;//whether you can or can't visit a location
 	private boolean always = false;//for visiting infinitely often
 	private boolean implies = false;
-	private boolean and = true;
-	private boolean or = false;
-	private boolean orMode = false;
+	private boolean and;
+	private boolean or;
+	
+	//b1 
+	private b1 b1_state = b1.AND;
+	
+	
+	///b2
+	
+	private b2 b2_state = b2.AND; 
+	
+	//t1
+	private t1 t1_state = t1.EVENTUALLY; 
+	
+	
+	//t2 
+	private t2 t2_state = t2.NONE; 
+	
+	
+	
 	private boolean eventually = true;
 	private boolean next = false;
 	private boolean until = false;
@@ -36,20 +55,7 @@ public class ColorBall {
 	
 	private int clickState = 0;
 
-	public ColorBall(Context context, int drawable1, int drawable2) {
-
-		BitmapFactory.Options opts = new BitmapFactory.Options();
-		opts.inJustDecodeBounds = true;
-		imgValid = BitmapFactory.decodeResource(context.getResources(),
-				drawable1);
-		imgInvalid = BitmapFactory.decodeResource(context.getResources(),
-				drawable2);
-		id = label = count;
-		ltlString.concat(String.valueOf(id));
-		ltlString = "F(" + ltlString + ")";
-		count++;
-
-	}
+	
 	
 	public ColorBall(ColorBall another){
 		this.activateSensor = another.activateSensor;
@@ -67,7 +73,7 @@ public class ColorBall {
 		this.imgInvalid = another.imgInvalid;
 		this.implies = another.implies;
 		this.imgValid = another.imgValid;
-		this.orMode = another.orMode;
+		
 		this.pickObject = another.pickObject;
 		this.valid = another.valid;
 		this.ltlString = another.ltlString;
@@ -93,7 +99,7 @@ public class ColorBall {
 		this.imgInvalid = another.imgInvalid;
 		this.implies = another.implies;
 		this.imgValid = another.imgValid;
-		this.orMode = another.orMode;
+		
 		this.pickObject = another.pickObject;
 		this.valid = another.valid;
 		this.ltlString = another.ltlString;
@@ -160,6 +166,27 @@ public class ColorBall {
 			return imgInvalid;
 		}
 	}
+	
+	public b1 getB1State(){
+		return b1_state;
+		
+	}
+	public b2 getB2State(){
+		return b2_state;
+		
+	}
+	public t1 getT1State(){
+		return t1_state;
+		
+	}
+	public t2 getT2State(){
+		return t2_state;
+		
+	}
+	
+	public void toggleB1State(){
+		b1_state = (b1_state==b1.AND)?b1.OR:b1.AND;
+	}
 
 	public int getWidth() {
 		return imgValid.getWidth();
@@ -204,6 +231,9 @@ public class ColorBall {
 
 	public void unsetArrowTo(int i) {
 		arrowTo[i - 1] = false;
+	}
+	public void setArrowTo(int i) {
+		arrowTo[i - 1] = true;
 	}
 	
 	public void toggleLineTo(int i) {
@@ -284,13 +314,7 @@ public class ColorBall {
 		eventually = !eventually;
 	}
 	
-	public void toggleORMode(){
-		orMode = !orMode;
-	}
 	
-	public boolean isORMode(){
-		return orMode;
-	}
 	
 	public boolean isAlwaysEventually(){
 		return alwaysEventually;
@@ -419,5 +443,91 @@ public class ColorBall {
 		}
 
 	}
+	
+	public b2 getNextB2State(){
+		b2 retState=b2.NONE;
+		switch(b2_state){
+		case AND:
+			retState = b2.OR;
+			break;
+		case OR:
+			retState = b2.IMPLIES;
+			break;
+		case IMPLIES:
+			retState = b2.NONE;
+			break;
+		case NONE:
+			retState = b2.AND;
+			break;
+			
+		}
+		return retState;
+	}
+	
+	public t1 getNextT1State(){
+		t1 retState=t1.NONE;
+		switch(t1_state){
+		case ALWAYS:
+			retState = t1.EVENTUALLY;
+			break;
+		case EVENTUALLY:
+			retState = t1.NEXT;
+			break;
+		case NEXT:
+			retState = t1.UNTIL;
+			break;
+		case UNTIL:
+			retState = t1.NONE;
+			break;
+		case NONE:
+			retState = t1.ALWAYS;
+			break;
+			
+		}
+		return retState;
+	}
+	
+	public t2 getNextT2State(){
+		t2 retState=t2.NONE;
+		switch(t2_state){
+		case ALWAYS:
+			retState = t2.EVENTUALLY;
+			break;
+		case EVENTUALLY:
+			retState = t2.NONE;
+			break;
+		case NONE:
+			retState = t2.ALWAYS;
+			break;
+		}
+		return retState;
+	}
+	
+	public void setOperators(b2 b2val, t1 t1val, t2 t2val){
+		b2_state = b2val;
+		t1_state = t1val;
+		t2_state = t2val;
+		
+		if(b2_state == b2.NONE){
+			t1_state = t1.UNTIL;
+		}
+		else{
+			if(t1val==t1.UNTIL)
+				t1_state = t1.EVENTUALLY;
+		}
+		if(t1val==t1.ALWAYS){
+			if(t2val==t2.ALWAYS)
+				t2_state = t2.NONE;
+			
+		}else if(t1val==t1.EVENTUALLY){
+			if(t2val==t2.EVENTUALLY)
+				t2_state = t2.NONE;
+		}
+		if(b2val!=b2.NONE && t1val==t1.NONE && t2val==t2.NONE){
+			t1_state = t1.EVENTUALLY;
+		}
+			
+	}
+	
 
 }
