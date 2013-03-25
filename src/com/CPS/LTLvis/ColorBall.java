@@ -13,7 +13,7 @@ public class ColorBall {
 	private int coordX = 0; // the x coordinate at the canvas
 	private int coordY = 0; // the y coordinate at the canvas
 	private int id; // gives every ball his own id, for now not necessary
-	private int label;//label of each node
+	private String label;//label of each node
 	private boolean enabled = false;
 	private static int count = 1;
 	private boolean goRight = true;
@@ -118,7 +118,8 @@ public class ColorBall {
 				drawable1);
 		imgInvalid = BitmapFactory.decodeResource(context.getResources(),
 				drawable2);
-		id = label = count;
+		id  = count;
+		label = Integer.toString(id);
 		// ltlString.concat(String.valueOf(id));
 		ltlString = String.valueOf(id);
 		setValid(isValid());
@@ -151,11 +152,11 @@ public class ColorBall {
 	public int getID() {
 		return id;
 	}
-	public int getLabel() {
+	public String getLabel() {
 		return label;
 	}
 	
-	public void setLabel(int value){
+	public void setLabel(String value){
 		label = value;
 	}
 
@@ -407,7 +408,7 @@ public class ColorBall {
 	
 	public boolean isLeaf(){
 		for(int i=0;i<10;i++){
-			if(isArrowTo(i))
+			if(isArrowTo(i+1))
 				return false;
 			
 		}
@@ -467,21 +468,23 @@ public class ColorBall {
 	public t1 getNextT1State(){
 		t1 retState=t1.NONE;
 		switch(t1_state){
-		case ALWAYS:
-			retState = t1.EVENTUALLY;
-			break;
+		
 		case EVENTUALLY:
 			retState = t1.NEXT;
 			break;
 		case NEXT:
-			retState = t1.UNTIL;
+			retState = t1.ALWAYS;
 			break;
-		case UNTIL:
+		case ALWAYS:
 			retState = t1.NONE;
 			break;
 		case NONE:
-			retState = t1.ALWAYS;
+			retState = t1.UNTIL;
 			break;
+		case UNTIL:
+			retState = t1.EVENTUALLY;
+			break;
+		
 			
 		}
 		return retState;
@@ -491,13 +494,16 @@ public class ColorBall {
 		t2 retState=t2.NONE;
 		switch(t2_state){
 		case ALWAYS:
-			retState = t2.EVENTUALLY;
-			break;
-		case EVENTUALLY:
 			retState = t2.NONE;
 			break;
+		case EVENTUALLY:
+			if(t1_state==t1.ALWAYS)
+				retState = t2.NONE;
+			else
+				retState = t2.ALWAYS;
+			break;
 		case NONE:
-			retState = t2.ALWAYS;
+			retState = t2.EVENTUALLY;
 			break;
 		}
 		return retState;
@@ -517,11 +523,11 @@ public class ColorBall {
 		}
 		if(t1val==t1.ALWAYS){
 			if(t2val==t2.ALWAYS)
-				t2_state = t2.NONE;
+				t2_state = t2.EVENTUALLY;
 			
 		}else if(t1val==t1.EVENTUALLY){
 			if(t2val==t2.EVENTUALLY)
-				t2_state = t2.NONE;
+				t2_state = t2.ALWAYS;
 		}
 		if(b2val!=b2.NONE && t1val==t1.NONE && t2val==t2.NONE){
 			t1_state = t1.EVENTUALLY;

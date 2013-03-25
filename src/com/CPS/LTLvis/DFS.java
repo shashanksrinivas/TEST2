@@ -103,6 +103,10 @@ class Graph {
 		
 		adjMat[start][end] = true;
 	}
+	
+	public boolean hasEdge(int start, int end){
+		return adjMat[start][end];
+	}
 
 public void unsetEdge(int start, int end) {
 		
@@ -557,8 +561,8 @@ public void unsetEdge(int start, int end) {
 		String notString = "";
 		for (int i = 0; i < 10; i++) {
 			int tempBalID = i + 1;
-			int toBalLabel = DrawView.colorballs[toBalID-1].getLabel();
-			if (i != (toBalLabel - 1) /* && i!=(fromBalID-1) */ && !DrawView.colorballs[toBalID-1].isLineTo(i+1)
+			String toBalLabel = DrawView.colorballs[toBalID-1].getLabel();
+			if (Integer.toString(i) != (toBalLabel) /* && i!=(fromBalID-1) */ && !DrawView.colorballs[toBalID-1].isLineTo(i+1)
 					&& MainActivity.waypoint[i] && DrawView.colorballs[i].getLabel()!=toBalLabel) {
 				if (notString == "") {
 
@@ -615,6 +619,8 @@ public void unsetEdge(int start, int end) {
 		return false;
 
 	}
+	
+	
 	
 	public boolean isRoot(int balID) {
 		for (int i = 0; i < 10; i++) {

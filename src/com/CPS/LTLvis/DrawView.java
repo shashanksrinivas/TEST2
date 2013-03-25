@@ -90,11 +90,11 @@ public class DrawView extends View {
 		 */
 
 		// setup start node with default arrows pointing to all other nodes
-		for (int i = 1; i < 10; i++) {
+		/*for (int i = 1; i < 10; i++) {
 			colorballs[0].setArrowTo(i + 1);// this is mandatory for source node
 			theGraph.setEdge(1, i + 1);
 			theGraph.unsetEdge(i + 1, 1);
-		}
+		}*/
 		paint.setDither(true);
 		paint.setColor(Color.BLACK);
 		paint.setStyle(Paint.Style.STROKE);
@@ -114,25 +114,27 @@ public class DrawView extends View {
 			canvas.drawBitmap(MainActivity.scaledBitmap, MainActivity.matrix,
 					null);
 		}
-
-		
+		paint.setStrokeWidth(3);
+		paint.setPathEffect(null);
+		paint.setColor(Color.GREEN);
+		canvas.drawCircle(colorballs[0].getX()+25, colorballs[0].getY()+25, 30, paint);
 		//set paint properties
 		paint.setStrokeWidth(3);
 		paint.setColor(Color.GRAY);
 		canvas.drawLine(0, 0, 0, 800, paint);
 		
-		//
-		for (int i = 1; i < 10; i++) {
-			if (isLeastInCompletelyConnected(i)){
-				colorballs[0].setArrowTo(i + 1);// this is mandatory for source
-												// node
-			theGraph.setEdge(1, i + 1);
-			theGraph.unsetEdge(i + 1, 1);
-			}else{
-				colorballs[0].unsetArrowTo(i + 1);
-				theGraph.unsetEdge(1, i + 1);
-			}
-		}
+		//set edges from source to all other nodes
+//		for (int i = 1; i < 10; i++) {
+//			if (isLeastInCompletelyConnected(i)){
+//				colorballs[0].setArrowTo(i + 1);// this is mandatory for source
+//												// node
+//			theGraph.setEdge(1, i + 1);
+//			theGraph.unsetEdge(i + 1, 1);
+//			}else{
+//				colorballs[0].unsetArrowTo(i + 1);
+//				theGraph.unsetEdge(1, i + 1);
+//			}
+//		}
 
 		//for b1 boolean OR
 		for (int i = 1; i < 10; i++) {
@@ -221,6 +223,7 @@ public class DrawView extends View {
 					canvas.drawPath(mPath, paint);
 					mPath.reset();
 					// bitmap for b2_state
+					b2 temp = colorballs[j].getB2State();
 					switch(colorballs[j].getB2State()){
 					case AND:
 						canvas.drawBitmap(andBitmap,
@@ -255,7 +258,8 @@ public class DrawView extends View {
 					}
 					
 					//bitmap for t1_state
-					switch(colorballs[i].getT1State()){
+					
+					switch(colorballs[j].getT1State()){
 					case EVENTUALLY:
 						canvas.drawBitmap(
 								eventuallyBitmap,
@@ -289,20 +293,24 @@ public class DrawView extends View {
 					}
 					
 					//bitmap for t2_state
-					switch(colorballs[i].getT2State()){
+					switch(colorballs[j].getT2State()){
 					case EVENTUALLY:
-						canvas.drawBitmap(
-								eventuallyBitmap,
-								(colorballs[i].getX() + colorballs[j].getX()) / 2,
-								(colorballs[i].getY() + colorballs[j].getY()) / 2,
-								paint);
+						canvas.drawBitmap(eventuallyBitmap,
+								((colorballs[i].getX() + colorballs[j]
+										.getX()) / 2 + (colorballs[j]
+										.getX())) / 2,
+								((colorballs[i].getY() + colorballs[j]
+										.getY()) / 2 + (colorballs[j]
+										.getY())) / 2, paint);
 						break;
 					case ALWAYS:
-						canvas.drawBitmap(
-								alwaysBitmap,
-								(colorballs[i].getX() + colorballs[j].getX()) / 2,
-								(colorballs[i].getY() + colorballs[j].getY()) / 2,
-								paint);
+						canvas.drawBitmap(alwaysBitmap,
+								((colorballs[i].getX() + colorballs[j]
+										.getX()) / 2 + (colorballs[j]
+										.getX())) / 2,
+								((colorballs[i].getY() + colorballs[j]
+										.getY()) / 2 + (colorballs[j]
+										.getY())) / 2, paint);
 						break;
 					case NONE:
 						break;
@@ -329,10 +337,10 @@ public class DrawView extends View {
 		}
 
 		invalidate();
-		/*MainActivity.finalLtlString = computeLtl();
+		MainActivity.finalLtlString = computeLTLrec(1);
 		MainActivity.mCurrentLtlOutput.setTextScaleX(2);
 		MainActivity.mCurrentLtlOutput.setText("LTL: "
-				+ MainActivity.finalLtlString);*/
+				+ MainActivity.finalLtlString);
 
 	}
 
@@ -495,8 +503,8 @@ public class DrawView extends View {
 					if (fromBalIDSingleTap != toBalIDSingleTap
 							&& MainActivity.waypoint[fromBalIDSingleTap - 1]
 							&& MainActivity.waypoint[toBalIDSingleTap - 1]
-							&& fromBalIDSingleTap != 1/* not on source node */
-							&& toBalIDSingleTap != 1) {
+							/*&& fromBalIDSingleTap != 1/* not on source node */
+							/*&& toBalIDSingleTap != 1*/) {
 						if (colorballs[fromBalIDSingleTap - 1]
 								.isArrowTo(toBalIDSingleTap)) {// check for
 																// arrows first
@@ -542,7 +550,7 @@ public class DrawView extends View {
 					if (fromBalID != toBalID
 							&& MainActivity.waypoint[fromBalID - 1]
 							&& MainActivity.waypoint[toBalID - 1]
-							&& fromBalID != 1 && toBalID != 1) {
+							/*&& fromBalID != 1 && toBalID != 1*/) {
 						if (colorballs[fromBalID - 1].isLineTo(toBalID)) {
 							colorballs[fromBalID - 1].toggleLineTo(toBalID);
 							colorballs[toBalID - 1].toggleLineTo(fromBalID);
@@ -631,6 +639,125 @@ public class DrawView extends View {
 		 */
 
 		return string;
+	}
+	
+	public String getText(t1 t1_state){
+		String retString = "";
+		switch(t1_state){
+		case ALWAYS:
+			retString = "G";
+			break;
+		case EVENTUALLY:
+			retString = "F";
+			break;
+		case NEXT:
+			retString = "X";
+			break;
+		case UNTIL:
+			retString = "U";
+			break;
+		case NONE:
+			retString = "";
+			break;
+			
+		}
+		return retString;
+	}
+	public String getText(t2 t2_state){
+		String retString = "";
+		switch(t2_state){
+		case ALWAYS:
+			retString = "G";
+			break;
+		case EVENTUALLY:
+			retString = "F";
+			break;
+		
+		case NONE:
+			retString = "";
+			break;
+			
+		}
+		return retString;
+	}
+	
+	public String getText(b2 b2_state){
+		String retString = "";
+		switch(b2_state){
+		case AND:
+			retString = "&&";
+			break;
+		case IMPLIES:
+			retString = "=>";
+			break;
+		case OR:
+			retString = "||";
+			break;
+		
+		case NONE:
+			retString = "";
+			break;
+			
+		}
+		return retString;
+	}
+	
+	public String getText(b1 b1_state){
+		String retString = "";
+		switch(b1_state){
+		case AND:
+			retString = "&&";
+			break;
+		
+		case OR:
+			retString = "||";
+			break;
+			
+		}
+		return retString;
+	}
+	
+	public String computeLTLrec(int balID){
+		String ltl="";
+		String neg = "";
+		String ltlBuf = "";
+		if(!colorballs[balID-1].isValid())//if ball is red ie do not visit
+			neg = "NOT";
+		
+		if(colorballs[balID-1].isLeaf()){
+			return neg + "(" + getCompleteLabel(balID-1) +")";
+		}else{
+			ltl = "";
+			for(int i=1;i<10;i++){
+				if(theGraph.hasEdge(balID, i+1) && MainActivity.waypoint[i]){
+					ltlBuf = computeLTLrec(i+1);
+					b1 b_1 = colorballs[i].getB1State();
+					b2 b_2 = colorballs[i].getB2State();
+					t1 t_1 = colorballs[i].getT1State();
+					t2 t_2 = colorballs[i].getT2State();
+					//colorballs[balID-1].getLabel()
+					if(t_1 == t1.UNTIL){
+						if(ltl == ""){
+							ltl = "((" + neg + "(" + getCompleteLabel(balID-1) + "))" + getText(t_1) + getText(t_2) + "(" + ltlBuf + "))";
+						}else{
+							ltl = ltl + getText(b_1) + "((" + neg + "(" + getCompleteLabel(balID-1) + "))" + getText(t_1) + getText(t_2) + "(" + ltlBuf + "))";
+						}
+						
+					
+							
+						}
+					else{
+						if(ltl == ""){
+							ltl = "((" + neg + "(" + getCompleteLabel(balID-1) + "))" + getText(b_2) + getText(t_1) + getText(t_2) + "(" + ltlBuf + "))";
+						}else{
+							ltl = ltl + getText(b_1) + "((" + neg + "(" + getCompleteLabel(balID-1) + "))" + getText(b_2) + getText(t_1) + getText(t_2) + "(" + ltlBuf + "))";
+						}
+					}
+				}
+			}
+		}
+		
+		return ltl;
 	}
 
 	public boolean isCompletelyConnected(int index) {
@@ -737,6 +864,18 @@ public class DrawView extends View {
 			}
 		}
 		return true;
+	}
+	
+	public String getCompleteLabel(int index){
+		String label=colorballs[index].getLabel();
+		if(isCompletelyConnected(index)){
+			for(int i =0;i<10;i++){
+				if(colorballs[index].isLineTo(i+1) && i!=index){
+					label = label + "||" + colorballs[i].getLabel();
+				}
+			}
+		}
+		return label;
 	}
 
 	@Override

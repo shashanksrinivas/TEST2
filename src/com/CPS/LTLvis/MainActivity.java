@@ -161,15 +161,16 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
-				int myNum = DrawView.colorballs[DrawView.balID - 1].getLabel();
+				String myLabel = DrawView.colorballs[DrawView.balID - 1].getLabel();
 				// Do something with value!
 				try {
-					myNum = Integer.parseInt(input.getText().toString());
+					//myNum = Integer.parseInt(input.getText().toString());
+					myLabel = input.getText().toString();
 				} catch (NumberFormatException nfe) {
 					System.out.println("Could not parse " + nfe);
 				}
 
-				DrawView.colorballs[DrawView.balID - 1].setLabel(myNum);
+				DrawView.colorballs[DrawView.balID - 1].setLabel(myLabel);
 				return;
 			}
 		});
