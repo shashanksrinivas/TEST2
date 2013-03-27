@@ -90,11 +90,11 @@ public class DrawView extends View {
 		 */
 
 		// setup start node with default arrows pointing to all other nodes
-		/*for (int i = 1; i < 10; i++) {
-			colorballs[0].setArrowTo(i + 1);// this is mandatory for source node
-			theGraph.setEdge(1, i + 1);
-			theGraph.unsetEdge(i + 1, 1);
-		}*/
+		/*
+		 * for (int i = 1; i < 10; i++) { colorballs[0].setArrowTo(i + 1);//
+		 * this is mandatory for source node theGraph.setEdge(1, i + 1);
+		 * theGraph.unsetEdge(i + 1, 1); }
+		 */
 		paint.setDither(true);
 		paint.setColor(Color.BLACK);
 		paint.setStyle(Paint.Style.STROKE);
@@ -117,35 +117,39 @@ public class DrawView extends View {
 		paint.setStrokeWidth(3);
 		paint.setPathEffect(null);
 		paint.setColor(Color.GREEN);
-		canvas.drawCircle(colorballs[0].getX()+25, colorballs[0].getY()+25, 30, paint);
-		//set paint properties
+		canvas.drawCircle(colorballs[0].getX() + 25, colorballs[0].getY() + 25,
+				30, paint);
+		// set paint properties
 		paint.setStrokeWidth(3);
 		paint.setColor(Color.GRAY);
 		canvas.drawLine(0, 0, 0, 800, paint);
-		
-		//set edges from source to all other nodes
-//		for (int i = 1; i < 10; i++) {
-//			if (isLeastInCompletelyConnected(i)){
-//				colorballs[0].setArrowTo(i + 1);// this is mandatory for source
-//												// node
-//			theGraph.setEdge(1, i + 1);
-//			theGraph.unsetEdge(i + 1, 1);
-//			}else{
-//				colorballs[0].unsetArrowTo(i + 1);
-//				theGraph.unsetEdge(1, i + 1);
-//			}
-//		}
 
-		//for b1 boolean OR
-		for (int i = 1; i < 10; i++) {
-			for (int j = 1; j < 10; j++) {
+		// set edges from source to all other nodes
+		// for (int i = 1; i < 10; i++) {
+		// if (isLeastInCompletelyConnected(i)){
+		// colorballs[0].setArrowTo(i + 1);// this is mandatory for source
+		// // node
+		// theGraph.setEdge(1, i + 1);
+		// theGraph.unsetEdge(i + 1, 1);
+		// }else{
+		// colorballs[0].unsetArrowTo(i + 1);
+		// theGraph.unsetEdge(1, i + 1);
+		// }
+		// }
+
+		// for b1 boolean OR
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
 				if (colorballs[i].isLineTo(j + 1) && MainActivity.waypoint[i]
 						&& MainActivity.waypoint[j]) {// bitmap
 					// for
 					// OR
 					paint.setColor(Color.CYAN);
-					paint.setPathEffect(new DashPathEffect(
-							new float[] { 10, 20 }, 0));
+					if (colorballs[i].getB1State() == b1.OR || colorballs[j].getB1State()==b1.OR)
+						paint.setPathEffect(new DashPathEffect(new float[] {
+								10, 20 }, 0));
+					else
+						paint.setPathEffect(null);
 					canvas.drawLine(colorballs[i].getX() + 25,
 							colorballs[i].getY() + 25,
 							colorballs[j].getX() + 25,
@@ -181,8 +185,8 @@ public class DrawView extends View {
 			for (int j = 0; j < 10; j++) {
 				if (colorballs[i].isArrowTo(j + 1) && MainActivity.waypoint[i]
 						&& MainActivity.waypoint[j]) {
-					
-					if (colorballs[i].getB1State()==b1.OR) {
+
+					if (colorballs[i].getB1State() == b1.OR) {
 						paint.setColor(Color.GRAY);
 						paint.setPathEffect(new DashPathEffect(new float[] {
 								10, 20 }, 0));// TODO:allocate elsewhere later
@@ -223,43 +227,48 @@ public class DrawView extends View {
 					canvas.drawPath(mPath, paint);
 					mPath.reset();
 					// bitmap for b2_state
+					// place bitmap at 1/4th the distance on the line connecting
+					// i and j
 					b2 temp = colorballs[j].getB2State();
-					switch(colorballs[j].getB2State()){
-					case AND:
-						canvas.drawBitmap(andBitmap,
-								((colorballs[i].getX() + colorballs[j]
-										.getX()) / 2 + (colorballs[i]
-										.getX())) / 2,
-								((colorballs[i].getY() + colorballs[j]
-										.getY()) / 2 + (colorballs[i]
-										.getY())) / 2, paint);
-						break;
-					case OR:
-						canvas.drawBitmap(orBitmap,
-								((colorballs[i].getX() + colorballs[j]
-										.getX()) / 2 + (colorballs[i]
-										.getX())) / 2,
-								((colorballs[i].getY() + colorballs[j]
-										.getY()) / 2 + (colorballs[i]
-										.getY())) / 2, paint);
-						break;
-					case IMPLIES:
-						canvas.drawBitmap(impliesBitmap,
-								((colorballs[i].getX() + colorballs[j]
-										.getX()) / 2 + (colorballs[i]
-										.getX())) / 2,
-								((colorballs[i].getY() + colorballs[j]
-										.getY()) / 2 + (colorballs[i]
-										.getY())) / 2, paint);
-						break;
-					case NONE:
-						break;
-						
+					if (!colorballs[i].getLabel().isEmpty()) {
+						switch (colorballs[j].getB2State()) {
+						case AND:
+							canvas.drawBitmap(andBitmap,
+									((colorballs[i].getX() + colorballs[j]
+											.getX()) / 2 + (colorballs[i]
+											.getX())) / 2,
+									((colorballs[i].getY() + colorballs[j]
+											.getY()) / 2 + (colorballs[i]
+											.getY())) / 2, paint);
+							break;
+						case OR:
+							canvas.drawBitmap(orBitmap,
+									((colorballs[i].getX() + colorballs[j]
+											.getX()) / 2 + (colorballs[i]
+											.getX())) / 2,
+									((colorballs[i].getY() + colorballs[j]
+											.getY()) / 2 + (colorballs[i]
+											.getY())) / 2, paint);
+							break;
+						case IMPLIES:
+							canvas.drawBitmap(impliesBitmap,
+									((colorballs[i].getX() + colorballs[j]
+											.getX()) / 2 + (colorballs[i]
+											.getX())) / 2,
+									((colorballs[i].getY() + colorballs[j]
+											.getY()) / 2 + (colorballs[i]
+											.getY())) / 2, paint);
+							break;
+						case NONE:
+							break;
+
+						}
 					}
-					
-					//bitmap for t1_state
-					
-					switch(colorballs[j].getT1State()){
+
+					// bitmap for t1_state
+					// place bitmap on the middle of the line connecting i and j
+
+					switch (colorballs[j].getT1State()) {
 					case EVENTUALLY:
 						canvas.drawBitmap(
 								eventuallyBitmap,
@@ -291,31 +300,31 @@ public class DrawView extends View {
 					case NONE:
 						break;
 					}
-					
-					//bitmap for t2_state
-					switch(colorballs[j].getT2State()){
+
+					// bitmap for t2_state
+					// place bitmap at 3/4t the distance on the line connecting
+					// i and j
+					switch (colorballs[j].getT2State()) {
 					case EVENTUALLY:
-						canvas.drawBitmap(eventuallyBitmap,
-								((colorballs[i].getX() + colorballs[j]
-										.getX()) / 2 + (colorballs[j]
+						canvas.drawBitmap(
+								eventuallyBitmap,
+								((colorballs[i].getX() + colorballs[j].getX()) / 2 + (colorballs[j]
 										.getX())) / 2,
-								((colorballs[i].getY() + colorballs[j]
-										.getY()) / 2 + (colorballs[j]
+								((colorballs[i].getY() + colorballs[j].getY()) / 2 + (colorballs[j]
 										.getY())) / 2, paint);
 						break;
 					case ALWAYS:
-						canvas.drawBitmap(alwaysBitmap,
-								((colorballs[i].getX() + colorballs[j]
-										.getX()) / 2 + (colorballs[j]
+						canvas.drawBitmap(
+								alwaysBitmap,
+								((colorballs[i].getX() + colorballs[j].getX()) / 2 + (colorballs[j]
 										.getX())) / 2,
-								((colorballs[i].getY() + colorballs[j]
-										.getY()) / 2 + (colorballs[j]
+								((colorballs[i].getY() + colorballs[j].getY()) / 2 + (colorballs[j]
 										.getY())) / 2, paint);
 						break;
 					case NONE:
 						break;
 					}
-					
+
 				}
 			}
 		}
@@ -323,6 +332,7 @@ public class DrawView extends View {
 		paint.setStrokeWidth(0);
 		paint.setTextScaleX(2);
 		paint.setTextSize(20);
+		// draw the waypoints themselves
 		for (int i = 0; i < 10; i++) {
 			if (MainActivity.waypoint[i]) {
 				canvas.drawBitmap(colorballs[i].getBitmap(),
@@ -337,7 +347,11 @@ public class DrawView extends View {
 		}
 
 		invalidate();
+		if(!MainActivity.templateMode){
 		MainActivity.finalLtlString = computeLTLrec(1);
+		}else{
+			MainActivity.finalLtlString =computeLtl();
+		}
 		MainActivity.mCurrentLtlOutput.setTextScaleX(2);
 		MainActivity.mCurrentLtlOutput.setText("LTL: "
 				+ MainActivity.finalLtlString);
@@ -461,29 +475,29 @@ public class DrawView extends View {
 		@Override
 		public void onShowPress(MotionEvent e) {
 			// TODO Auto-generated method stub
-//			if (balID > 0) {
-//				Toast.makeText(
-//						getContext(),
-//						" \t#DETAILS#\n VISIT NODE:"
-//								+ DrawView.colorballs[balID - 1].isValid()
-//								+ "\n ALWAYS: "
-//								+ DrawView.colorballs[balID - 1].isAlways()
-//								+ "\nFUTURE: "
-//								+ DrawView.colorballs[balID - 1].isEventually()
-//								+ "\nOR MODE: "
-//								+ DrawView.colorballs[balID - 1].isORMode()
-//								+ "\nPICKUP OBJECT: "
-//								+ DrawView.colorballs[balID - 1].isPickObject()
-//								+ "\nDROP OBJECT: "
-//								+ DrawView.colorballs[balID - 1].isDropObject()
-//								+ "\nACTIVATE SENSOR: "
-//								+ DrawView.colorballs[balID - 1]
-//										.isActivateSensor()
-//								+ "\nDEACTIVATE SENSOR: "
-//								+ DrawView.colorballs[balID - 1]
-//										.isDeactivateSensor(),
-//						Toast.LENGTH_LONG).show();
-//			}
+			// if (balID > 0) {
+			// Toast.makeText(
+			// getContext(),
+			// " \t#DETAILS#\n VISIT NODE:"
+			// + DrawView.colorballs[balID - 1].isValid()
+			// + "\n ALWAYS: "
+			// + DrawView.colorballs[balID - 1].isAlways()
+			// + "\nFUTURE: "
+			// + DrawView.colorballs[balID - 1].isEventually()
+			// + "\nOR MODE: "
+			// + DrawView.colorballs[balID - 1].isORMode()
+			// + "\nPICKUP OBJECT: "
+			// + DrawView.colorballs[balID - 1].isPickObject()
+			// + "\nDROP OBJECT: "
+			// + DrawView.colorballs[balID - 1].isDropObject()
+			// + "\nACTIVATE SENSOR: "
+			// + DrawView.colorballs[balID - 1]
+			// .isActivateSensor()
+			// + "\nDEACTIVATE SENSOR: "
+			// + DrawView.colorballs[balID - 1]
+			// .isDeactivateSensor(),
+			// Toast.LENGTH_LONG).show();
+			// }
 		}
 
 		@Override
@@ -503,8 +517,8 @@ public class DrawView extends View {
 					if (fromBalIDSingleTap != toBalIDSingleTap
 							&& MainActivity.waypoint[fromBalIDSingleTap - 1]
 							&& MainActivity.waypoint[toBalIDSingleTap - 1]
-							/*&& fromBalIDSingleTap != 1/* not on source node */
-							/*&& toBalIDSingleTap != 1*/) {
+					/* && fromBalIDSingleTap != 1/* not on source node */
+					/* && toBalIDSingleTap != 1 */) {
 						if (colorballs[fromBalIDSingleTap - 1]
 								.isArrowTo(toBalIDSingleTap)) {// check for
 																// arrows first
@@ -550,7 +564,7 @@ public class DrawView extends View {
 					if (fromBalID != toBalID
 							&& MainActivity.waypoint[fromBalID - 1]
 							&& MainActivity.waypoint[toBalID - 1]
-							/*&& fromBalID != 1 && toBalID != 1*/) {
+					/* && fromBalID != 1 && toBalID != 1 */) {
 						if (colorballs[fromBalID - 1].isLineTo(toBalID)) {
 							colorballs[fromBalID - 1].toggleLineTo(toBalID);
 							colorballs[toBalID - 1].toggleLineTo(fromBalID);
@@ -640,10 +654,10 @@ public class DrawView extends View {
 
 		return string;
 	}
-	
-	public String getText(t1 t1_state){
+
+	public String getText(t1 t1_state) {
 		String retString = "";
-		switch(t1_state){
+		switch (t1_state) {
 		case ALWAYS:
 			retString = "G";
 			break;
@@ -659,31 +673,32 @@ public class DrawView extends View {
 		case NONE:
 			retString = "";
 			break;
-			
+
 		}
 		return retString;
 	}
-	public String getText(t2 t2_state){
+
+	public String getText(t2 t2_state) {
 		String retString = "";
-		switch(t2_state){
+		switch (t2_state) {
 		case ALWAYS:
 			retString = "G";
 			break;
 		case EVENTUALLY:
 			retString = "F";
 			break;
-		
+
 		case NONE:
 			retString = "";
 			break;
-			
+
 		}
 		return retString;
 	}
-	
-	public String getText(b2 b2_state){
+
+	public String getText(b2 b2_state) {
 		String retString = "";
-		switch(b2_state){
+		switch (b2_state) {
 		case AND:
 			retString = "&&";
 			break;
@@ -693,70 +708,100 @@ public class DrawView extends View {
 		case OR:
 			retString = "||";
 			break;
-		
+
 		case NONE:
 			retString = "";
 			break;
-			
+
 		}
 		return retString;
 	}
-	
-	public String getText(b1 b1_state){
+
+	public String getText(b1 b1_state) {
 		String retString = "";
-		switch(b1_state){
+		switch (b1_state) {
 		case AND:
 			retString = "&&";
 			break;
-		
+
 		case OR:
 			retString = "||";
 			break;
-			
+
 		}
 		return retString;
 	}
-	
-	public String computeLTLrec(int balID){
-		String ltl="";
+
+	public String computeLTLrec(int balID) {
+		String ltl = "";
 		String neg = "";
 		String ltlBuf = "";
-		if(!colorballs[balID-1].isValid())//if ball is red ie do not visit
-			neg = "NOT";
-		
-		if(colorballs[balID-1].isLeaf()){
-			return neg + "(" + getCompleteLabel(balID-1) +")";
-		}else{
+		//if (!colorballs[balID - 1].isValid())// if ball is red ie do not visit
+		//	neg = "NOT";
+
+		if (colorballs[balID - 1].isLeaf()) {
+			return neg + "(" + getCompleteLabel(balID - 1) + ")";
+		} else {
 			ltl = "";
-			for(int i=1;i<10;i++){
-				if(theGraph.hasEdge(balID, i+1) && MainActivity.waypoint[i]){
-					ltlBuf = computeLTLrec(i+1);
+			for (int i = 1; i < 10; i++) {
+				if (theGraph.hasEdge(balID, i + 1) && MainActivity.waypoint[i]) {
+					ltlBuf = computeLTLrec(i + 1);
 					b1 b_1 = colorballs[i].getB1State();
 					b2 b_2 = colorballs[i].getB2State();
 					t1 t_1 = colorballs[i].getT1State();
 					t2 t_2 = colorballs[i].getT2State();
-					//colorballs[balID-1].getLabel()
-					if(t_1 == t1.UNTIL){
-						if(ltl == ""){
-							ltl = "((" + neg + "(" + getCompleteLabel(balID-1) + "))" + getText(t_1) + getText(t_2) + "(" + ltlBuf + "))";
-						}else{
-							ltl = ltl + getText(b_1) + "((" + neg + "(" + getCompleteLabel(balID-1) + "))" + getText(t_1) + getText(t_2) + "(" + ltlBuf + "))";
+					// colorballs[balID-1].getLabel()
+					if (t_1 == t1.UNTIL) {
+						if (ltl == "") {
+							if (getCompleteLabel(balID - 1) != "") {
+								ltl = "((" + neg + "("
+										+ getCompleteLabel(balID - 1) + "))"
+										+ getText(t_1) + getText(t_2) + "("
+										+ ltlBuf + "))";
+							} else {
+								ltl = "(" + getText(t_1) + getText(t_2) + "("
+										+ ltlBuf + "))";
+							}
+						} else {
+							if (getCompleteLabel(balID - 1) != "") {
+								ltl = ltl + getText(b_1) + "((" + neg + "("
+										+ getCompleteLabel(balID - 1) + "))"
+										+ getText(t_1) + getText(t_2) + "("
+										+ ltlBuf + "))";
+							} else {
+								ltl = ltl + getText(b_1) + "(" + getText(t_1)
+										+ getText(t_2) + "(" + ltlBuf + "))";
+							}
 						}
-						
-					
-							
-						}
-					else{
-						if(ltl == ""){
-							ltl = "((" + neg + "(" + getCompleteLabel(balID-1) + "))" + getText(b_2) + getText(t_1) + getText(t_2) + "(" + ltlBuf + "))";
-						}else{
-							ltl = ltl + getText(b_1) + "((" + neg + "(" + getCompleteLabel(balID-1) + "))" + getText(b_2) + getText(t_1) + getText(t_2) + "(" + ltlBuf + "))";
+
+					} else {
+						if (ltl == "") {
+							if (!getCompleteLabel(balID - 1).isEmpty()) {
+								ltl = "((" + neg + "("
+										+ getCompleteLabel(balID - 1) + "))"
+										+ getText(b_2) + getText(t_1)
+										+ getText(t_2) + "(" + ltlBuf + "))";
+							} else {
+								ltl = "(" + getText(t_1) + getText(t_2) + "("
+										+ ltlBuf + "))";
+							}
+						} else {
+							if (!getCompleteLabel(balID - 1).isEmpty()) {
+								ltl = ltl + getText(b_1) + "((" + neg + "("
+										+ getCompleteLabel(balID - 1) + "))"
+										+ getText(b_2) + getText(t_1)
+										+ getText(t_2) + "(" + ltlBuf + "))";
+							} else {
+
+								ltl = ltl + getText(b_1) + "(" + getText(t_1)
+										+ getText(t_2) + "(" + ltlBuf + "))";
+							}
 						}
 					}
 				}
 			}
 		}
-		
+
 		return ltl;
 	}
 
@@ -865,13 +910,35 @@ public class DrawView extends View {
 		}
 		return true;
 	}
-	
-	public String getCompleteLabel(int index){
-		String label=colorballs[index].getLabel();
-		if(isCompletelyConnected(index)){
-			for(int i =0;i<10;i++){
-				if(colorballs[index].isLineTo(i+1) && i!=index){
-					label = label + "||" + colorballs[i].getLabel();
+
+	public String getCompleteLabel(int index) {
+		String neg = "";
+		if (!colorballs[index].isValid() && !colorballs[index].getLabel().isEmpty())// if ball is red ie do not visit
+			neg = "!";
+		String label = neg + colorballs[index].getLabel();
+		if (isCompletelyConnected(index)) {
+			for (int i = 0; i < 10; i++) {
+				if (!colorballs[i].isValid())// if ball is red ie do not visit
+					neg = "!";
+				else
+					neg = "";
+
+				if (colorballs[index].isLineTo(i + 1) && i != index
+						&& MainActivity.waypoint[i]) {
+					if (colorballs[index].getB1State() == b1.OR) {
+						if (!label.isEmpty()) {
+							label = label + "||" + neg
+									+ colorballs[i].getLabel();
+						}else{
+							label = neg + colorballs[i].getLabel();
+						}
+					} else {
+						if(!label.isEmpty()){
+						label = label + "&&" + neg + colorballs[i].getLabel();
+						}else{
+							label = neg + colorballs[i].getLabel();
+						}
+					}
 				}
 			}
 		}

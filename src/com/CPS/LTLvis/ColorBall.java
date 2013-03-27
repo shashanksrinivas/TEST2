@@ -66,7 +66,7 @@ public class ColorBall {
 		this.deactivateSensor = another.deactivateSensor;
 		this.dropObject = another.dropObject;
 		this.enabled = another.enabled;
-		this.eventually = another.eventually;
+		//this.eventually = another.eventually;
 		this.goDown = another.goDown;
 		this.goRight = another.goRight;
 		this.id = another.id;
@@ -92,7 +92,7 @@ public class ColorBall {
 		this.deactivateSensor = another.deactivateSensor;
 		this.dropObject = another.dropObject;
 		this.enabled = another.enabled;
-		this.eventually = another.eventually;
+		//this.eventually = another.eventually;
 		this.goDown = another.goDown;
 		this.goRight = another.goRight;
 		this.id = another.id;

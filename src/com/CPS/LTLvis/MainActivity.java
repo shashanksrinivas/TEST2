@@ -55,6 +55,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	static Bitmap alteredBitmap;
 	RadioGroup robotGroup;
 	private int mCurrentMission = 0;
+	static boolean templateMode=false;
 
 	Canvas canvas;
 	Paint paint;
@@ -83,6 +84,9 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	CheckBox wayPoint8;
 	CheckBox wayPoint9;
 	CheckBox wayPoint10;
+	
+	CheckBox templateModeCheckBox;
+
 
 	static boolean waypoint[] = new boolean[10];// keeps the status of waypoints
 												// (enabled/disabled)
@@ -104,6 +108,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	private Button mDelMissionButton;
 	private Button mAddMissionButton;
 	private Button mPreviewLtlButton;
+	
 
 	static LinkedList<String> stringList = new LinkedList<String>();
 	AlertDialog.Builder alert;
@@ -306,9 +311,14 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 						Toast.LENGTH_LONG).show();
 			}
 		});
+		
+		
 		// //end of stuff related to quick action menu
 		// //////////////////////////////////////////////////////////////////////////////////////
 
+		templateModeCheckBox = (CheckBox) findViewById(R.id.templateModeCheckbox);
+		templateModeCheckBox.setOnCheckedChangeListener(this);
+		
 		wayPoint1 = (CheckBox) findViewById(R.id.wayPoint1);
 		wayPoint2 = (CheckBox) findViewById(R.id.wayPoint2);
 		wayPoint3 = (CheckBox) findViewById(R.id.wayPoint3);
@@ -369,6 +379,8 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 			}
 		});
 
+		
+		
 		mUploadStringButton = (Button) findViewById(R.id.uploadLTL);
 		mUploadStringButton.setOnClickListener(new OnClickListener() {
 
@@ -529,6 +541,9 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		switch (buttonView.getId()) {
+		case R.id.templateModeCheckbox:
+			templateMode = isChecked;
+			break;
 		case R.id.wayPoint1:
 			waypoint[0] = isChecked;
 			dv.colorballs[0].setEnabled(isChecked);
