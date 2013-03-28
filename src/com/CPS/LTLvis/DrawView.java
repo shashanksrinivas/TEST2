@@ -20,8 +20,8 @@ public class DrawView extends View {
 	static ColorBall[] colorballs = new ColorBall[11]; // array that holds the
 														// balls
 	static ColorBall startColorball;// the start node in the graph
-	private boolean templateMode = true;// template mode does not use the
-										// recursive algorithm
+	private boolean templateMode = false;// template mode does not use the
+											// recursive algorithm
 	Graph theGraph = new Graph();// initialize the graph
 	static int balID = 0; // variable to know what ball is being dragged
 	static int fromBalID = 0;
@@ -145,7 +145,8 @@ public class DrawView extends View {
 					// for
 					// OR
 					paint.setColor(Color.CYAN);
-					if (colorballs[i].getB1State() == b1.OR || colorballs[j].getB1State()==b1.OR)
+					if (colorballs[i].getB1State() == b1.OR
+							|| colorballs[j].getB1State() == b1.OR)
 						paint.setPathEffect(new DashPathEffect(new float[] {
 								10, 20 }, 0));
 					else
@@ -324,7 +325,116 @@ public class DrawView extends View {
 					case NONE:
 						break;
 					}
+					// /Template section
+					// draw the template bitmap if b2 is implies and t1 is next
+					// and you are in template mode
+					if (MainActivity.templateMode) {
+						if (colorballs[j].getB2State() == b2.IMPLIES
+								&& colorballs[j].getT1State() == t1.NEXT) {
+							canvas.drawBitmap(templateBitmap, (colorballs[i]
+									.getX() + colorballs[j].getX()) / 2,
+									(colorballs[i].getY() + colorballs[j]
+											.getY()) / 2, paint);
 
+						}
+						
+						//place a dummy start node and draw bitmaps
+						paint.setColor(Color.GRAY);
+						canvas.drawText("S", 25, 25, paint);
+						paint.setStyle(Paint.Style.FILL);
+						canvas.drawCircle(0, 0, 25, paint);
+
+						for (int k = 0; k < 10; k++) {
+							if (MainActivity.waypoint[k] && isRoot(k + 1) /*&& isLeastInCompletelyConnected(k)*/) {
+								canvas.drawLine(0, 0, colorballs[k].getX() + 25,
+										colorballs[k].getY() + 25, paint);
+								if (colorballs[k].getT1State()!=t1.NONE) {
+									float deltaX2 = colorballs[k].getX() - 0;
+									float deltaY2 = colorballs[k].getY() - 0;
+									float frac2 = (float) 0.05;
+									float point_x_12 = 0 + (float) ((1 - frac2) * deltaX2 * 0.8 + frac
+											* 0.5 * deltaY2);
+									float point_y_12 = 0 + (float) ((1 - frac2) * deltaY2 * 0.8 - frac
+											* 0.5 * deltaX2);
+									float point_x_22 = colorballs[k].getX();
+									float point_y_22 = colorballs[k].getY();
+									float point_x_32 = 0 + (float) ((1 - frac2) * deltaX2 * 0.8 - frac
+											* 0.5 * deltaY2);
+									float point_y_32 = 0 + (float) ((1 - frac2) * deltaY2 * 0.8 + frac
+											* 0.5 * deltaX2);
+
+									mPath.moveTo((point_x_12) + 25, (point_y_12) + 25);
+									mPath.lineTo((point_x_22) + 25, (point_y_22) + 25);
+									mPath.lineTo((point_x_32) + 25, (point_y_32) + 25);
+									mPath.lineTo((point_x_12) + 25, (point_y_12) + 25);
+
+									paint.setStyle(Paint.Style.FILL);
+									canvas.drawPath(mPath, paint);
+									mPath.reset();
+								}
+
+								switch (colorballs[k].getT1State()) {
+								case EVENTUALLY:
+									canvas.drawBitmap(
+											eventuallyBitmap,
+											(colorballs[k].getX()) / 2,
+											(colorballs[k].getY()) / 2,
+											paint);
+									break;
+								case ALWAYS:
+									canvas.drawBitmap(
+											alwaysBitmap,
+											(colorballs[k].getX()) / 2,
+											(colorballs[k].getY()) / 2,
+											paint);
+									break;
+								case NEXT:
+									canvas.drawBitmap(
+											nextBitmap,
+											(colorballs[k].getX()) / 2,
+											(colorballs[k].getY()) / 2,
+											paint);
+									break;
+								case UNTIL:
+									canvas.drawBitmap(
+											untilBitmap,
+											(colorballs[k].getX()) / 2,
+											(colorballs[k].getY()) / 2,
+											paint);
+									break;
+								case NONE:
+									break;
+								}
+
+								// bitmap for t2_state
+								// place bitmap at 3/4t the distance on the line connecting
+								// i and j
+								switch (colorballs[j].getT2State()) {
+								case EVENTUALLY:
+									canvas.drawBitmap(
+											eventuallyBitmap,
+											((colorballs[k].getX()) / 2 + (colorballs[k]
+													.getX())) / 2,
+											(( colorballs[k].getY()) / 2 + (colorballs[k]
+													.getY())) / 2, paint);
+									break;
+								case ALWAYS:
+									canvas.drawBitmap(
+											alwaysBitmap,
+											((colorballs[k].getX()) / 2 + (colorballs[k]
+													.getX())) / 2,
+											(( colorballs[k].getY()) / 2 + (colorballs[k]
+													.getY())) / 2, paint);
+									break;
+								case NONE:
+									break;
+								}
+
+							}
+						}
+						
+					}
+					///end template mode drawing
 				}
 			}
 		}
@@ -347,10 +457,10 @@ public class DrawView extends View {
 		}
 
 		invalidate();
-		if(!MainActivity.templateMode){
-		MainActivity.finalLtlString = computeLTLrec(1);
-		}else{
-			MainActivity.finalLtlString =computeLtl();
+		if (!MainActivity.templateMode) {
+			MainActivity.finalLtlString = computeLTLrec(1);
+		} else {
+			MainActivity.finalLtlString = computeLtl();
 		}
 		MainActivity.mCurrentLtlOutput.setTextScaleX(2);
 		MainActivity.mCurrentLtlOutput.setText("LTL: "
@@ -736,8 +846,9 @@ public class DrawView extends View {
 		String ltl = "";
 		String neg = "";
 		String ltlBuf = "";
-		//if (!colorballs[balID - 1].isValid())// if ball is red ie do not visit
-		//	neg = "NOT";
+		// if (!colorballs[balID - 1].isValid())// if ball is red ie do not
+		// visit
+		// neg = "NOT";
 
 		if (colorballs[balID - 1].isLeaf()) {
 			return neg + "(" + getCompleteLabel(balID - 1) + ")";
@@ -913,7 +1024,9 @@ public class DrawView extends View {
 
 	public String getCompleteLabel(int index) {
 		String neg = "";
-		if (!colorballs[index].isValid() && !colorballs[index].getLabel().isEmpty())// if ball is red ie do not visit
+		if (!colorballs[index].isValid()
+				&& !colorballs[index].getLabel().isEmpty())// if ball is red ie
+															// do not visit
 			neg = "!";
 		String label = neg + colorballs[index].getLabel();
 		if (isCompletelyConnected(index)) {
@@ -929,13 +1042,14 @@ public class DrawView extends View {
 						if (!label.isEmpty()) {
 							label = label + "||" + neg
 									+ colorballs[i].getLabel();
-						}else{
+						} else {
 							label = neg + colorballs[i].getLabel();
 						}
 					} else {
-						if(!label.isEmpty()){
-						label = label + "&&" + neg + colorballs[i].getLabel();
-						}else{
+						if (!label.isEmpty()) {
+							label = label + "&&" + neg
+									+ colorballs[i].getLabel();
+						} else {
 							label = neg + colorballs[i].getLabel();
 						}
 					}
