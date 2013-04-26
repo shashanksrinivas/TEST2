@@ -208,13 +208,13 @@ public class MainActivity extends Activity implements OnCheckedChangeListener {
 		ActionItem toggleLocItem = new ActionItem(ID_LOC, "VISIT / AVOID",
 				getResources().getDrawable(R.drawable.toggle_loc));
 		ActionItem changeB1State = new ActionItem(ID_B1STATE, "CHANGE B1",
-				getResources().getDrawable(R.drawable.toggle_always));
+				getResources().getDrawable(R.drawable.or_mode));
 		ActionItem changeB2State = new ActionItem(ID_B2STATE, "CHANGE B2",
-				getResources().getDrawable(R.drawable.toggle_future));
+				getResources().getDrawable(R.drawable.b2_bitmap));
 		ActionItem changeT1State = new ActionItem(ID_T1STATE, "CHANGE T1",
-				getResources().getDrawable(R.drawable.toggle_until));
+				getResources().getDrawable(R.drawable.t1_bitmap));
 		ActionItem changeT2State = new ActionItem(ID_T2STATE, "CHANGE T2",
-				getResources().getDrawable(R.drawable.toggle_next));
+				getResources().getDrawable(R.drawable.t2_bitmap));
 
 		ActionItem setLabel = new ActionItem(ID_LABEL, "SET LABEL",
 				getResources().getDrawable(R.drawable.set_label));

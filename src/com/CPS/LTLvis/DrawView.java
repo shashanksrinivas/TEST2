@@ -117,6 +117,7 @@ public class DrawView extends View {
 		paint.setStrokeWidth(3);
 		paint.setPathEffect(null);
 		paint.setColor(Color.GREEN);
+		if(!MainActivity.templateMode)
 		canvas.drawCircle(colorballs[0].getX() + 25, colorballs[0].getY() + 25,
 				30, paint);
 		// set paint properties
@@ -329,7 +330,7 @@ public class DrawView extends View {
 					// draw the template bitmap if b2 is implies and t1 is next
 					// and you are in template mode
 					if (MainActivity.templateMode) {
-						if (colorballs[j].getB2State() == b2.IMPLIES
+						if ((colorballs[j].getB2State() == b2.IMPLIES || colorballs[j].getB2State()==b2.AND)
 								&& colorballs[j].getT1State() == t1.NEXT) {
 							canvas.drawBitmap(templateBitmap, (colorballs[i]
 									.getX() + colorballs[j].getX()) / 2,
@@ -345,7 +346,7 @@ public class DrawView extends View {
 						canvas.drawCircle(0, 0, 25, paint);
 
 						for (int k = 0; k < 10; k++) {
-							if (MainActivity.waypoint[k] && isRoot(k + 1) /*&& isLeastInCompletelyConnected(k)*/) {
+							if (MainActivity.waypoint[k] && isRoot(k + 1) && isLeastInCompletelyConnected(k)) {
 								canvas.drawLine(0, 0, colorballs[k].getX() + 25,
 										colorballs[k].getY() + 25, paint);
 								if (colorballs[k].getT1State()!=t1.NONE) {
@@ -458,7 +459,7 @@ public class DrawView extends View {
 
 		invalidate();
 		if (!MainActivity.templateMode) {
-			MainActivity.finalLtlString = computeLTLrec(1);
+			MainActivity.finalLtlString = computeLTLrec(1,colorballs[0].getB1State());
 		} else {
 			MainActivity.finalLtlString = computeLtl();
 		}
@@ -842,7 +843,7 @@ public class DrawView extends View {
 		return retString;
 	}
 
-	public String computeLTLrec(int balID) {
+	public String computeLTLrec(int balID, b1 b_1_prev) {
 		String ltl = "";
 		String neg = "";
 		String ltlBuf = "";
@@ -856,11 +857,12 @@ public class DrawView extends View {
 			ltl = "";
 			for (int i = 1; i < 10; i++) {
 				if (theGraph.hasEdge(balID, i + 1) && MainActivity.waypoint[i]) {
-					ltlBuf = computeLTLrec(i + 1);
+					
 					b1 b_1 = colorballs[i].getB1State();
 					b2 b_2 = colorballs[i].getB2State();
 					t1 t_1 = colorballs[i].getT1State();
 					t2 t_2 = colorballs[i].getT2State();
+					ltlBuf = computeLTLrec(i + 1, b_1);
 					// colorballs[balID-1].getLabel()
 					if (t_1 == t1.UNTIL) {
 						if (ltl == "") {
@@ -875,12 +877,12 @@ public class DrawView extends View {
 							}
 						} else {
 							if (getCompleteLabel(balID - 1) != "") {
-								ltl = ltl + getText(b_1) + "((" + neg + "("
+								ltl = ltl + getText(b_1_prev) + "((" + neg + "("
 										+ getCompleteLabel(balID - 1) + "))"
 										+ getText(t_1) + getText(t_2) + "("
 										+ ltlBuf + "))";
 							} else {
-								ltl = ltl + getText(b_1) + "(" + getText(t_1)
+								ltl = ltl + getText(b_1_prev) + "(" + getText(t_1)
 										+ getText(t_2) + "(" + ltlBuf + "))";
 							}
 						}
@@ -898,13 +900,13 @@ public class DrawView extends View {
 							}
 						} else {
 							if (!getCompleteLabel(balID - 1).isEmpty()) {
-								ltl = ltl + getText(b_1) + "((" + neg + "("
+								ltl = ltl + getText(b_1_prev) + "((" + neg + "("
 										+ getCompleteLabel(balID - 1) + "))"
 										+ getText(b_2) + getText(t_1)
 										+ getText(t_2) + "(" + ltlBuf + "))";
 							} else {
 
-								ltl = ltl + getText(b_1) + "(" + getText(t_1)
+								ltl = ltl + getText(b_1_prev) + "(" + getText(t_1)
 										+ getText(t_2) + "(" + ltlBuf + "))";
 							}
 						}
